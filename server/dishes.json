@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Pesto Pasta",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Cheeseburger",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Chicken Tenders",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Mac and Cheese",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+
+  {
+    "name": "Quinoa Bowl",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Grilled Salmon",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Roasted Vegetables",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Turkey Meatballs",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+
+  {
+    "name": "Chicken Shawarma",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Falafel Wrap",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Margherita Pizza",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Penne Pasta Pomodoro",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+
+  {
+    "name": "Chicken Tikka Masala",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Chana Masala",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Orange Chicken",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Vegetable Fried Rice",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  }
+]
