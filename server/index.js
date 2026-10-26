@@ -19,6 +19,20 @@ app.get("/api/halls", async (request, response) => {
   }
 });
 
+app.get("/api/halls/:hallName/dishes", async (request, response) => {
+  try {
+    const regex = new RegExp(`^${request.params.hallName}$`, "i");
+    const dishes = await Dish.find({ hall: { $regex: regex } });
+    if (dishes.length === 0) {
+      return response.status(404).json({ error: "No dishes found for this hall" });
+    }
+    response.json(dishes);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 const port = process.env.PORT || 4000;
 
 mongoose
