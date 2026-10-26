@@ -5,6 +5,11 @@ import Dish from "./models/Dish.js";
 const app = express();
 app.use(express.json());
 
+function escapeRegExp(string) {
+  // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+  }
+
 app.get("/api/health", (request, response) => {
   response.json({ status: "ok" });
 });
@@ -21,7 +26,8 @@ app.get("/api/halls", async (request, response) => {
 
 app.get("/api/halls/:hallName/dishes", async (request, response) => {
   try {
-    const regex = new RegExp(`^${request.params.hallName}$`, "i");
+    const escaped = escapeRegExp(request.params.hallName);
+    const regex = new RegExp(`^${escaped}$`, "i");
     const dishes = await Dish.find({ hall: { $regex: regex } });
     if (dishes.length === 0) {
       return response.status(404).json({ error: "No dishes found for this hall" });
