@@ -282,31 +282,143 @@
   },
 
   {
-    "name": "Chicken Shawarma",
+    "name": "Roasted Salmon w/ Creamy Herb Sauce",
     "hall": "Epicuria",
     "vegetarian": false,
     "vegan": false,
     "glutenFree": true
   },
   {
-    "name": "Falafel Wrap",
+    "name": "Balsamic Chicken Wings",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Braised Spicy Lentils w/ Potatoes & Tomatoes",
     "hall": "Epicuria",
     "vegetarian": true,
     "vegan": true,
-    "glutenFree": false
+    "glutenFree": true
   },
   {
-    "name": "Margherita Pizza",
+    "name": "4 Cheese Baked Lasagna",
     "hall": "Epicuria",
     "vegetarian": true,
     "vegan": false,
     "glutenFree": false
   },
   {
-    "name": "Penne Pasta Pomodoro",
+    "name": "Zatar Chicken & Yam Soup",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Eggplant \"Bacon\" BLT Sandwich",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Hummus",
     "hall": "Epicuria",
     "vegetarian": true,
     "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Baba Ghanoush",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Dolma",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Cheese Pizza",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Moussaka Pizza",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Pasta Frutti di Mare",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Yellow Lentil Kofta",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Mediterranean Chicken Drumstick",
+    "hall": "Epicuria",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Turkish Eggplant Gratin w/ Mustard Greens & Bulgur",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Mushroom & Mozzarella Stromboli",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Lebanese Rice Pudding",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Greek Honey Pistachio Cake",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Cannoli",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Rotini w/ Onions & Blue Cheese",
+    "hall": "Epicuria",
+    "vegetarian": true,
+    "vegan": false,
     "glutenFree": false
   },
 
