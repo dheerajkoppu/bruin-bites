@@ -423,31 +423,143 @@
   },
 
   {
-    "name": "Chicken Tikka Masala",
-    "hall": "Feast",
-    "vegetarian": false,
-    "vegan": false,
-    "glutenFree": true
-  },
-  {
-    "name": "Chana Masala",
-    "hall": "Feast",
-    "vegetarian": true,
-    "vegan": true,
-    "glutenFree": true
-  },
-  {
-    "name": "Orange Chicken",
+    "name": "Kare Kare Beef",
     "hall": "Feast",
     "vegetarian": false,
     "vegan": false,
     "glutenFree": false
   },
   {
-    "name": "Vegetable Fried Rice",
+    "name": "Vegetable & Tofu Peanut Butter Curry",
     "hall": "Feast",
     "vegetarian": true,
     "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Vegetable Egg Roll",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Paneer and Veggie Flatbread",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Korean Gochujang Chicken Flatbread",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Loaded Takoyaki",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Build-Your-Own Poke Bowl",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Japanese Beef Bowl",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Vegan Beef Sukiyaki",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Galbi Tang",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Soon Tofu Stew w/ Dumplings",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Korean Pork & Chive Pancake",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Kimchi Pancake",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Korean Fried Chicken Bao",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Seared Tofu w/ Spicy Sauce",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Chicken Teriyaki",
+    "hall": "Feast",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Miso Soup",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Mango Sago w/ Peaches",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Coconut Tapioca",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "White Chocolate Chip Matcha Cookie",
+    "hall": "Feast",
+    "vegetarian": true,
+    "vegan": false,
     "glutenFree": false
   }
 ]
