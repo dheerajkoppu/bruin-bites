@@ -141,31 +141,143 @@
   },
 
   {
-    "name": "Quinoa Bowl",
+    "name": "Jalapeno Egg, Plantain & Black Bean Bowl",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Vegan Scrambled Eggs",
     "hall": "Bruin Plate",
     "vegetarian": true,
     "vegan": true,
     "glutenFree": true
   },
   {
-    "name": "Grilled Salmon",
+    "name": "Ginger Pancake w/ Banana Walnut Topping",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Vegan Pancake",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Creamy Tomato Basil Soup",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Sesame Tofu, Volcano Rice & Mixed Cabbage Bowl",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Salmon, Dill Goat Cheese, & Cucumber Stacker",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Spinach & Bulgur Wheat Taco",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Southwest Black Bean & Avocado Tortilla Pizza",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Cilantro Pesto w/ Tri-Tip Tortilla Pizza",
     "hall": "Bruin Plate",
     "vegetarian": false,
     "vegan": false,
     "glutenFree": true
   },
   {
-    "name": "Roasted Vegetables",
+    "name": "Moroccan Grilled Chicken Thigh",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Farro-Mushroom Stacker",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Eastern-Spiced Pork, Lentil, Quinoa, & Spinach Bowl",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Lemon Dill Tofu, Bulgur Wheat, & Cucumber Salad Bowl",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Red Chile Chicken Wings",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "White Bean Ragout w/ Quinoa, Green Beans, & Mushroom",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Roasted Beet, Caramelized Onion & Blue Cheese Pizza",
+    "hall": "Bruin Plate",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Grilled Barramundi w/ Cabbage",
+    "hall": "Bruin Plate",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Roasted Plantains",
     "hall": "Bruin Plate",
     "vegetarian": true,
     "vegan": true,
     "glutenFree": true
   },
   {
-    "name": "Turkey Meatballs",
+    "name": "Fudgy Brownie",
     "hall": "Bruin Plate",
-    "vegetarian": false,
-    "vegan": false,
+    "vegetarian": true,
+    "vegan": true,
     "glutenFree": false
   },
 
