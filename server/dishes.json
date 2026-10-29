@@ -1,27 +1,139 @@
 [
   {
-    "name": "Pesto Pasta",
+    "name": "Huevos Rancheros",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Buttery Hash Browns",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Belgian Waffles",
     "hall": "De Neve",
     "vegetarian": true,
     "vegan": false,
     "glutenFree": false
   },
   {
-    "name": "Cheeseburger",
+    "name": "Bodega Egg & Bacon Roll",
     "hall": "De Neve",
     "vegetarian": false,
     "vegan": false,
     "glutenFree": false
   },
   {
-    "name": "Chicken Tenders",
+    "name": "Tater Tots",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Macaroni & Cheese",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Country Fried Beef Steak",
     "hall": "De Neve",
     "vegetarian": false,
     "vegan": false,
     "glutenFree": false
   },
   {
-    "name": "Mac and Cheese",
+    "name": "Beyond Chicken Tenders",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Steak Cut Fries",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Pepperoni Pizza",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Pepper & Mushroom Pizza",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Bruin Burger",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "LA Hot Chicken Sandwich",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Beyond Burger",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": false
+  },
+  {
+    "name": "Sweet Potato Fries",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": true,
+    "glutenFree": true
+  },
+  {
+    "name": "Lemon Garlic Chicken Thighs",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Chicken Tortilla Soup",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": true
+  },
+  {
+    "name": "Chicken Pot Pie",
+    "hall": "De Neve",
+    "vegetarian": false,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Vegetable Pot Pie",
+    "hall": "De Neve",
+    "vegetarian": true,
+    "vegan": false,
+    "glutenFree": false
+  },
+  {
+    "name": "Key Lime Pie",
     "hall": "De Neve",
     "vegetarian": true,
     "vegan": false,
