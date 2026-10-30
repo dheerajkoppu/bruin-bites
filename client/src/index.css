@@ -29,4 +29,59 @@ main {
 .nav-links {
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+.signup-card {
+  max-width: 400px;
+  margin: 32px auto;
+}
+
+.signup-form {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.signup-form label {
+  font-weight: 600;
+}
+
+.signup-form input,
+.signup-form button {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.signup-form input {
+  margin-bottom: 8px;
+}
+
+.signup-form button {
+  border-color: #2774ae;
+  background: #2774ae;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.signup-form :focus-visible {
+  outline: 3px solid #2774ae;
+  outline-offset: 3px;
+}
+
+.signup-form :disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.form-error {
+  margin: 0 0 8px;
+  color: #b42318;
+  overflow-wrap: anywhere;
 }
