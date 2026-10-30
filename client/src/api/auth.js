@@ -1,47 +1,51 @@
-async function readResponse(response) {
-  const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    const message = data?.message || data?.error;
-    throw new Error(
-      typeof message === "string"
-        ? message
-        : "We couldn't create your account. Please try again.",
-    );
-  }
-
-  if (!data?.user || typeof data.user !== "object") {
-    throw new Error("The server returned an invalid account response. Please try again.");
-  }
-
-  return data.user;
-}
-
-export async function signup({ email, username, password }) {
+async function authRequest(path, options = {}) {
   let response;
   try {
-    response = await fetch("/api/auth/signup", {
-      method: "POST",
+    response = await fetch(`/api/auth/${path}`, {
+      ...options,
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.trim(),
-        username: username.trim(),
-        password,
-      }),
     });
-  } catch {
+  } catch (error) {
+    if (error.name === "AbortError") throw error;
     throw new Error("Unable to reach the server. Check your connection and try again.");
   }
 
-  return readResponse(response);
+  if (path === "me" && response.status === 401) return null;
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = data?.message || data?.error;
+    const fallback = path === "signup"
+      ? "We couldn't create your account. Please try again."
+      : "Something went wrong. Please try again.";
+    throw new Error(typeof message === "string" ? message : fallback);
+  }
+  if (path === "logout") return null;
+  if (typeof data?.user?.username !== "string" || typeof data?.user?.email !== "string") {
+    throw new Error("The server returned an invalid account response. Please try again.");
+  }
+  return data.user;
 }
 
-export async function getCurrentUser(signal) {
-  const response = await fetch("/api/auth/me", {
-    credentials: "include",
-    signal,
+export function login({ email, password }) {
+  return authRequest("login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.trim(), password }),
   });
-  if (response.status === 401) return null;
-  return readResponse(response);
+}
+
+export function signup({ email, username, password }) {
+  return authRequest("signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.trim(), username: username.trim(), password }),
+  });
+}
+
+export function logout() {
+  return authRequest("logout", { method: "POST" });
+}
+
+export function getCurrentUser(signal) {
+  return authRequest("me", { signal });
 }
