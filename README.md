@@ -23,7 +23,7 @@ npm install
 cp .env.example .env
 ```
 
-Open `server/.env` and paste the MongoDB connection string from the group chat. Never commit `.env`.
+Open `server/.env`, paste the MongoDB connection string from the group chat, and set `SESSION_SECRET` to any long random string. Never commit `.env`.
 
 ```bash
 npm run seed   # adds the starter dishes to the database
@@ -42,15 +42,14 @@ npm run dev    # opens the app on http://localhost:5173
 
 The client sends any request starting with `/api` to the server, so in React you can just write `fetch('/api/...')`.
 
-### Signup API integration (proposed contract, Since US1 frontend relies on API Integration)
+### Auth API
 
-The signup frontend is implemented; the auth API is still pending. Confirm these assumptions with the backend owner before end-to-end testing:
+Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. Errors are `{ "error": "message" }`.
 
-- `POST /api/auth/signup` accepts JSON `{ email, username, password }`. On success it returns `{ user: { username, email, ... } }` and sets an HttpOnly session cookie, logging the new student in.
-- Failed signup returns a non-2xx status with `{ message: "..." }` (or `{ error: "..." }`). The form displays that server message, including duplicate-email and duplicate-username errors.
-- `GET /api/auth/me` returns `{ user: { username, email, ... } }` for an existing session, or HTTP 401 when signed out. This restores the profile and navigation after a page refresh.
-
-Requests include cookies. Auth tokens and passwords are not stored in browser storage. After successful signup the client keeps the returned user in React context and redirects to `/profile`. Without these backend endpoints, signup cannot create accounts or establish a session.
+| Request | Success | Errors |
+|---|---|---|
+| `POST /api/auth/signup` `{ email, username, password }` | `201 { user }`, sets cookie | 400 invalid field, 409 email or username taken |
+| `GET /api/auth/me` | `200 { user }` | 401 not logged in |
 
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
 
@@ -64,6 +63,9 @@ client/
     App.jsx       routes
 server/
   index.js        Express app
+  session.js      session cookie setup
+  routes/         one router per feature
+  middleware/     error handler
   models/         Mongoose models
   dishes.json     starter dishes for the seed script
 ```
