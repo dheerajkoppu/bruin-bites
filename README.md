@@ -49,6 +49,8 @@ Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. 
 | Request | Success | Errors |
 |---|---|---|
 | `POST /api/auth/signup` `{ email, username, password }` | `201 { user }`, sets cookie | 400 invalid field, 409 email or username taken |
+| `POST /api/auth/login` `{ email, password }` | `200 { user }`, sets cookie | 401 wrong email or password |
+| `POST /api/auth/logout` | 204, clears cookie | |
 | `GET /api/auth/me` | `200 { user }` | 401 not logged in |
 
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.

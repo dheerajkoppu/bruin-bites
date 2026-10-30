@@ -20,6 +20,23 @@ router.post("/signup", async (request, response) => {
   response.status(201).json({ user });
 });
 
+router.post("/login", async (request, response) => {
+  const { email, password } = request.body;
+  const user = await User.findOne({ email: String(email ?? "").trim().toLowerCase() }).select("+password");
+  if (!user || !(await user.checkPassword(String(password ?? "")))) {
+    throw new HttpError(401, "Incorrect email or password.");
+  }
+  request.session.userId = user.id;
+  response.json({ user });
+});
+
+router.post("/logout", (request, response) => {
+  request.session.destroy(() => {
+    response.clearCookie("connect.sid");
+    response.sendStatus(204);
+  });
+});
+
 router.get("/me", async (request, response) => {
   const user = request.session.userId && (await User.findById(request.session.userId));
   if (!user) {
