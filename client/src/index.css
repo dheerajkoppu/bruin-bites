@@ -29,26 +29,32 @@ main {
 .nav-links {
   display: flex;
   gap: 16px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.signup-card {
+.signup-card,
+.auth-card {
   max-width: 400px;
   margin: 32px auto;
 }
 
-.signup-form {
+.signup-form,
+.auth-form {
   display: grid;
   gap: 10px;
   margin: 24px 0;
 }
 
-.signup-form label {
+.signup-form label,
+.auth-form label {
   font-weight: 600;
 }
 
 .signup-form input,
-.signup-form button {
+.auth-form input,
+.signup-form button,
+.auth-form button {
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
@@ -58,11 +64,13 @@ main {
   font: inherit;
 }
 
-.signup-form input {
+.signup-form input,
+.auth-form input {
   margin-bottom: 8px;
 }
 
-.signup-form button {
+.signup-form button,
+.auth-form button {
   border-color: #2774ae;
   background: #2774ae;
   color: white;
@@ -70,12 +78,26 @@ main {
   cursor: pointer;
 }
 
-.signup-form :focus-visible {
+.nav-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #2774ae;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.signup-form :focus-visible,
+.auth-form :focus-visible,
+.nav-button:focus-visible {
   outline: 3px solid #2774ae;
   outline-offset: 3px;
 }
 
-.signup-form :disabled {
+.signup-form :disabled,
+.auth-form :disabled,
+.nav-button:disabled {
   opacity: 0.65;
   cursor: wait;
 }
