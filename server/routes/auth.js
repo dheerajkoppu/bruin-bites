@@ -1,8 +1,15 @@
 import { Router } from "express";
+import { promisify } from "node:util";
 import { HttpError } from "../middleware/errorHandler.js";
 import User from "../models/User.js";
 
 const router = Router();
+
+// A new session ID stops a cookie planted before login from working after it.
+async function startSession(request, user) {
+  await promisify(request.session.regenerate).call(request.session);
+  request.session.userId = user.id;
+}
 
 router.post("/signup", async (request, response) => {
   const { email, username, password } = request.body;
@@ -16,7 +23,7 @@ router.post("/signup", async (request, response) => {
   }
 
   await user.save();
-  request.session.userId = user.id;
+  await startSession(request, user);
   response.status(201).json({ user });
 });
 
@@ -26,12 +33,15 @@ router.post("/login", async (request, response) => {
   if (!user || !(await user.checkPassword(String(password ?? "")))) {
     throw new HttpError(401, "Incorrect email or password.");
   }
-  request.session.userId = user.id;
+  await startSession(request, user);
   response.json({ user });
 });
 
-router.post("/logout", (request, response) => {
-  request.session.destroy(() => {
+router.post("/logout", (request, response, next) => {
+  request.session.destroy((error) => {
+    if (error) {
+      return next(error);
+    }
     response.clearCookie("connect.sid");
     response.sendStatus(204);
   });
