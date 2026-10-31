@@ -40,6 +40,23 @@ app.get("/api/halls/:hallName/dishes", async (request, response) => {
     response.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.get("/api/dishes", async (request, response) => {
+  try {
+    const { search } = request.query;
+    if (typeof search !== "string" || search.trim() === "") {
+      return response.json([]);
+    }
+    const escaped = escapeRegExp(search);
+    const regex = new RegExp(escaped, "i");
+    const dishes = await Dish.find({ name: { $regex: regex } });
+    response.json(dishes);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.use("/api/auth", authRouter);
 
 app.use(errorHandler);
