@@ -6,7 +6,14 @@ function NavBar() {
   const { user, isLoading, signOut } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState("");
+  const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
+
+  function handleSearch(event) {
+    event.preventDefault();
+    const query = searchText.trim();
+    if (query) navigate("/search?q=" + encodeURIComponent(query));
+  }
 
   async function handleLogout() {
     if (isLoggingOut) return;
@@ -28,7 +35,16 @@ function NavBar() {
         Bruin Bites
       </Link>
       <div className="nav-links">
-        <Link to="/search">Search</Link>
+        <form className="search-form" role="search" onSubmit={handleSearch}>
+          <input
+            type="search"
+            aria-label="Search dishes"
+            placeholder="Search dishes"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+          />
+          <button type="submit">Search</button>
+        </form>
         {isLoading ? <span role="status">Checking session…</span> : user ? (
           <>
             <Link to="/profile">{user.username}</Link>

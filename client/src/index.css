@@ -33,6 +33,20 @@ main {
   flex-wrap: wrap;
 }
 
+.search-form {
+  display: flex;
+  gap: 6px;
+}
+
+.search-form input,
+.search-form button {
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  font: inherit;
+}
+
 .signup-card,
 .auth-card {
   max-width: 400px;
