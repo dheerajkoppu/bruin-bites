@@ -6,10 +6,11 @@ import Search from "./pages/Search.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 function App() {
   return (
-    <div>
+    <AuthProvider>
       <NavBar />
       <main>
         <Routes>
@@ -21,7 +22,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>
-    </div>
+    </AuthProvider>
   );
 }
 

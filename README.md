@@ -23,7 +23,7 @@ npm install
 cp .env.example .env
 ```
 
-Open `server/.env` and paste the MongoDB connection string from the group chat. Never commit `.env`.
+Open `server/.env`, paste the MongoDB connection string from the group chat, and set `SESSION_SECRET` to any long random string. Never commit `.env`.
 
 ```bash
 npm run seed   # adds the starter dishes to the database
@@ -42,6 +42,17 @@ npm run dev    # opens the app on http://localhost:5173
 
 The client sends any request starting with `/api` to the server, so in React you can just write `fetch('/api/...')`.
 
+### Auth API
+
+Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. Errors are `{ "error": "message" }`.
+
+| Request | Success | Errors |
+|---|---|---|
+| `POST /api/auth/signup` `{ email, username, password }` | `201 { user }`, sets cookie | 400 invalid field, 409 email or username taken |
+| `GET /api/auth/me` | `200 { user }` | 401 not logged in |
+
+Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
+
 ## Folders
 
 ```
@@ -52,6 +63,9 @@ client/
     App.jsx       routes
 server/
   index.js        Express app
+  session.js      session cookie setup
+  routes/         one router per feature
+  middleware/     error handler
   models/         Mongoose models
   dishes.json     starter dishes for the seed script
 ```

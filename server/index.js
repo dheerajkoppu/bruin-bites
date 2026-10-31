@@ -2,8 +2,13 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import Dish from "./models/Dish.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import authRouter from "./routes/auth.js";
+import { createSession } from "./session.js";
+
 const app = express();
 app.use(express.json());
+app.use(createSession());
 
 function escapeRegExp(string) {
   // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
@@ -38,6 +43,9 @@ app.get("/api/halls/:hallName/dishes", async (request, response) => {
     response.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.use("/api/auth", authRouter);
+
+app.use(errorHandler);
 
 const port = process.env.PORT || 4000;
 
