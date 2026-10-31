@@ -34,9 +34,6 @@ app.get("/api/halls/:hallName/dishes", async (request, response) => {
     const escaped = escapeRegExp(request.params.hallName);
     const regex = new RegExp(`^${escaped}$`, "i");
     const dishes = await Dish.find({ hall: { $regex: regex } });
-    if (dishes.length === 0) {
-      return response.status(404).json({ error: "No dishes found for this hall" });
-    }
     response.json(dishes);
   } catch (error) {
     console.error(error);
