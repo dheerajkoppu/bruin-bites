@@ -29,8 +29,11 @@ function CompareDishes({ dish, group, onDone }) {
       })
       .then((ratings) => {
         if (!isCurrent) return;
+        // Leave out this dish in case you're re-rating it.
         const sameGroup = ratings
-          .filter((rating) => rating.group === group)
+          .filter(
+            (rating) => rating.group === group && rating.dish._id !== dish._id,
+          )
           .sort((a, b) => a.position - b.position);
         setRankedDishes(sameGroup);
         setLow(0);
