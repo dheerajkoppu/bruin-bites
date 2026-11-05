@@ -35,6 +35,7 @@ function CompareDishes({ dish, group, onDone }) {
         setRankedDishes(sameGroup);
         setLow(0);
         setHigh(sameGroup.length);
+        if (sameGroup.length === 0) saveRating(0);
       })
       .catch((error) => {
         if (isCurrent) setError(error.message);
@@ -42,6 +43,7 @@ function CompareDishes({ dish, group, onDone }) {
     return () => {
       isCurrent = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dish._id, group]);
 
   function pick(newDishWasBetter) {
