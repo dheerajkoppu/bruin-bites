@@ -55,6 +55,24 @@ Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. 
 
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
 
+### Profile ratings
+
+`/profile` fetches the signed-in user's saved ratings from `GET /api/ratings/me` with the session cookie each time the page opens, including after logging back in. It groups dishes under "Liked it", "It was fine", and "Didn't like it". Ratings are stored by the API, with no browser storage used for persistence.
+
+The frontend expects an array of populated ratings:
+
+```json
+[
+  {
+    "_id": "rating-id",
+    "group": "liked",
+    "dish": { "_id": "dish-id", "name": "Pasta", "hall": "Epicuria" }
+  }
+]
+```
+
+`group` is `liked`, `fine`, or `disliked`; an account with no ratings returns `[]`. The rating API is tracked in #22 and is not implemented in this branch. Until it is available, the profile shows a loading error with a retry button. Frontend tests mock this contract; verifying database persistence across logout and login requires that backend.
+
 ## Folders
 
 ```
