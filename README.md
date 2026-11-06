@@ -96,4 +96,5 @@ server/
 2. Make a branch for it: `git checkout -b your-name/short-description`
 3. Commit as you go, then push and open a pull request into `main`.
 4. Put `Closes #<issue number>` in the PR description.
-5. Get one teammate to review before merging. Don't push straight to `main`.
+5. Wait for the CI check on your PR to pass. It runs lint, tests, and the build in `client/`, and installs and syntax-checks `server/`. If it fails, click "Details" on the check to see why.
+6. Get one teammate to review before merging. Don't push straight to `main`.
