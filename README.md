@@ -88,7 +88,16 @@ server/
   middleware/     error handler
   models/         Mongoose models
   dishes.json     starter dishes for the seed script
+render.yaml       Render deploy settings
 ```
+
+## Deploying
+
+The live site runs on [Render](https://render.com) as one web service. Express serves both the API and the built React app, so they share one domain and the login cookie works. The settings are in `render.yaml`.
+
+Every merge into `main` deploys on its own once the CI check passes. You don't need to do anything.
+
+The live site uses its own database, `bruin-bites-prod`, in the same Atlas cluster, so testing on your laptop doesn't touch it. The free plan sleeps after 15 minutes with no visitors, so the first page load after that can take up to a minute.
 
 ## How we work
 

@@ -1,12 +1,15 @@
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
+import path from "node:path";
 import Dish from "./models/Dish.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import { createSession } from "./session.js";
 
 const app = express();
+// Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(createSession());
 
@@ -59,6 +62,16 @@ app.get("/api/dishes", async (request, response) => {
 
 app.use("/api/auth", authRouter);
 
+// Serve the built React app so the site and the API share one domain in production
+const clientBuildDirectory = path.join(import.meta.dirname, "..", "client", "dist");
+app.use(express.static(clientBuildDirectory));
+app.use((request, response, next) => {
+  if (request.method !== "GET" || request.path.startsWith("/api")) {
+    return next();
+  }
+  response.sendFile(path.join(clientBuildDirectory, "index.html"));
+});
+
 app.use(errorHandler);
 
 const port = process.env.PORT || 4000;
@@ -73,4 +86,5 @@ mongoose
   })
   .catch((error) => {
     console.error("Could not connect to MongoDB:", error.message);
+    process.exit(1);
   });
