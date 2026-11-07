@@ -44,6 +44,21 @@ app.get("/api/halls/:hallName/dishes", async (request, response) => {
   }
 });
 
+app.get("/api/dishes/:dishId", async (request, response) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(request.params.dishId)) {
+      return response.status(404).json({ error: "Invalid dish ID" });
+    }
+    const dish = await Dish.findById(request.params.dishId);
+    if (!dish) {
+      return response.status(404).json({ error: "Dish not found" });
+    }
+    response.json(dish);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
 app.get("/api/dishes", async (request, response) => {
   try {
     const { search } = request.query;
