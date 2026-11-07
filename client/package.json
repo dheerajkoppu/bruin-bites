@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "test": "node --test src/api/*.test.js && vitest run --environment jsdom src/auth.test.jsx src/search.test.jsx src/hall.test.jsx",
+
+    "test": "node --test src/api/*.test.js && vitest run --environment jsdom src/auth.test.jsx src/search.test.jsx src/hall.test.jsx src/compare.test.jsx src/profile.test.jsx",
+
     "preview": "vite preview"
   },
   "dependencies": {

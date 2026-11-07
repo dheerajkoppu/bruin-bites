@@ -1,5 +1,6 @@
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
+import ProfileRatings from "../components/ProfileRatings.jsx";
 
 function Profile() {
   const { user, isLoading, sessionError, restoreSession } = useAuth();
@@ -20,6 +21,7 @@ function Profile() {
       <h1>My Profile</h1>
       <p>Welcome, {user.username}!</p>
       <p>{user.email}</p>
+      <ProfileRatings key={user._id || user.email} />
     </div>
   );
 }

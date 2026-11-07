@@ -55,6 +55,26 @@ Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. 
 
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
 
+### Profile ratings
+
+`/profile` fetches the signed-in user's saved ratings from `GET /api/ratings/me` with the session cookie each time the page opens, including after logging back in. It groups dishes under "Liked it", "It was fine", and "Didn't like it", orders each group by ascending `position` (best first), and displays numbered dishes with the API's scores out of 10 to one decimal place. Ratings and scores are stored or calculated by the API, with no browser storage used for persistence.
+
+The frontend expects an array of populated ratings:
+
+```json
+[
+  {
+    "_id": "rating-id",
+    "group": "liked",
+    "position": 0,
+    "score": 10,
+    "dish": { "_id": "dish-id", "name": "Pasta", "hall": "Epicuria" }
+  }
+]
+```
+
+`group` is `liked`, `fine`, or `disliked`; `position` is a nonnegative integer within the group, and `score` is a finite number from 0 to 10. An account with no ratings returns `[]`. The backend owns score calculation (liked: 7–10, fine: 4–6.9, disliked: 0–3.9). The rating and ranking APIs are tracked in #22 and #25 and are not implemented in this branch. Until the ranked response is available, the profile shows an error with a retry button. Frontend tests mock this contract; verifying real rankings and persistence across logout and login requires that backend.
+
 ## Folders
 
 ```
@@ -70,7 +90,16 @@ server/
   middleware/     error handler
   models/         Mongoose models
   dishes.json     starter dishes for the seed script
+render.yaml       Render deploy settings
 ```
+
+## Deploying
+
+The live site runs on [Render](https://render.com) as one web service. Express serves both the API and the built React app, so they share one domain and the login cookie works. The settings are in `render.yaml`.
+
+Every merge into `main` deploys on its own once the CI check passes. You don't need to do anything.
+
+The live site uses its own database, `bruin-bites-prod`, in the same Atlas cluster, so testing on your laptop doesn't touch it. The free plan sleeps after 15 minutes with no visitors, so the first page load after that can take up to a minute.
 
 ## How we work
 
@@ -78,4 +107,5 @@ server/
 2. Make a branch for it: `git checkout -b your-name/short-description`
 3. Commit as you go, then push and open a pull request into `main`.
 4. Put `Closes #<issue number>` in the PR description.
-5. Get one teammate to review before merging. Don't push straight to `main`.
+5. Wait for the CI check on your PR to pass. It runs lint, tests, and the build in `client/`, and installs and syntax-checks `server/`. If it fails, click "Details" on the check to see why.
+6. Get one teammate to review before merging. Don't push straight to `main`.

@@ -121,3 +121,68 @@ main {
   color: #b42318;
   overflow-wrap: anywhere;
 }
+
+.profile-ratings {
+  margin-top: 32px;
+}
+
+.rating-group {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.rating-group h3 {
+  margin: 0 0 12px;
+}
+
+.rating-count {
+  color: #555;
+  font-weight: normal;
+}
+
+.rated-dishes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rated-dishes li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+}
+
+.rated-dishes li + li {
+  border-top: 1px solid #eee;
+}
+
+.rated-dish-name {
+  font-weight: 600;
+}
+
+.ranked-dishes li {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.dish-rank {
+  color: #555;
+}
+
+.ranked-dish-details {
+  display: grid;
+  gap: 4px;
+}
+
+.dish-score {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #2774ae;
+}
