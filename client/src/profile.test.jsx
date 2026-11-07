@@ -6,9 +6,9 @@ import App from "./App.jsx";
 
 const account = { _id: "user-1", username: "testbruin", email: "student@ucla.edu" };
 const ratings = [
-  { _id: "r1", group: "liked", dish: { _id: "d1", name: "Pasta", hall: "Epicuria" } },
-  { _id: "r2", group: "fine", dish: { _id: "d2", name: "Salad", hall: "De Neve" } },
-  { _id: "r3", group: "disliked", dish: { _id: "d3", name: "Soup", hall: "Bruin Plate" } },
+  { _id: "r1", group: "liked", position: 0, score: 10, dish: { _id: "d1", name: "Pasta", hall: "Epicuria" } },
+  { _id: "r2", group: "fine", position: 0, score: 6.9, dish: { _id: "d2", name: "Salad", hall: "De Neve" } },
+  { _id: "r3", group: "disliked", position: 0, score: 3.9, dish: { _id: "d3", name: "Soup", hall: "Bruin Plate" } },
 ];
 
 afterEach(() => {
@@ -52,6 +52,50 @@ test("profile displays saved dishes in their rating groups with hall links", asy
     expect(within(section).getAllByRole("listitem")).toHaveLength(1);
   }
   expect(screen.getByRole("link", { name: "De Neve" }).getAttribute("href")).toBe("/halls/De%20Neve");
+});
+
+test("each group ranks shuffled dishes by position and shows the API scores including zero", async () => {
+  const lowerRatings = ratings.map((rating, index) => ({
+    ...rating,
+    _id: `lower-${index}`,
+    position: 1,
+    score: [7, 4, 0][index],
+    dish: { ...rating.dish, _id: `lower-dish-${index}`, name: `${rating.dish.name} alternative` },
+  }));
+  mockApi({ getRatings: () => Response.json([
+    lowerRatings[2], lowerRatings[0], ratings[1], lowerRatings[1], ratings[2], ratings[0],
+  ]) });
+  openProfile();
+  await screen.findByText("Pasta");
+  for (const [index, label] of ["Liked it", "It was fine", "Didn't like it"].entries()) {
+    const list = screen.getByRole("list", { name: `${label} ranked dishes` });
+    expect(list.tagName).toBe("OL");
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    for (const [itemIndex, rating] of [ratings[index], lowerRatings[index]].entries()) {
+      expect(within(items[itemIndex]).getByText(rating.dish.name)).toBeTruthy();
+      expect(within(items[itemIndex]).getByLabelText(`Score: ${rating.score.toFixed(1)} out of 10`).textContent)
+        .toBe(`${rating.score.toFixed(1)} / 10`);
+    }
+  }
+});
+
+test("scores are displayed to one decimal without recalculating them from rank", async () => {
+  mockApi({ getRatings: () => Response.json([{ ...ratings[0], score: 8.26 }]) });
+  openProfile();
+  expect((await screen.findByLabelText("Score: 8.3 out of 10")).textContent).toBe("8.3 / 10");
+});
+
+test("missing scores show an error and allow retrying a valid ranked response", async () => {
+  let attempts = 0;
+  mockApi({ getRatings: () => Response.json(++attempts === 1
+    ? [{ ...ratings[0], score: undefined }] : ratings),
+  });
+  openProfile();
+  expect((await screen.findByRole("alert")).textContent).toContain("invalid ratings");
+  expect(screen.queryByText("Pasta")).toBeNull();
+  await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+  expect(await screen.findByLabelText("Score: 10.0 out of 10")).toBeTruthy();
 });
 
 test("ratings wait for authentication and show a loading state while fetching", async () => {
@@ -108,6 +152,7 @@ test("saved ratings are fetched again after logout and login", async () => {
   expect(await screen.findByText("Pasta")).toBeTruthy();
   expect(screen.getByText("Salad")).toBeTruthy();
   expect(screen.getByText("Soup")).toBeTruthy();
+  expect(screen.getByLabelText("Score: 10.0 out of 10")).toBeTruthy();
   expect(fetchMock.mock.calls.filter(([url]) => url === "/api/ratings/me")).toHaveLength(2);
 });
 

@@ -57,7 +57,7 @@ Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the fr
 
 ### Profile ratings
 
-`/profile` fetches the signed-in user's saved ratings from `GET /api/ratings/me` with the session cookie each time the page opens, including after logging back in. It groups dishes under "Liked it", "It was fine", and "Didn't like it". Ratings are stored by the API, with no browser storage used for persistence.
+`/profile` fetches the signed-in user's saved ratings from `GET /api/ratings/me` with the session cookie each time the page opens, including after logging back in. It groups dishes under "Liked it", "It was fine", and "Didn't like it", orders each group by ascending `position` (best first), and displays numbered dishes with the API's scores out of 10 to one decimal place. Ratings and scores are stored or calculated by the API, with no browser storage used for persistence.
 
 The frontend expects an array of populated ratings:
 
@@ -66,12 +66,14 @@ The frontend expects an array of populated ratings:
   {
     "_id": "rating-id",
     "group": "liked",
+    "position": 0,
+    "score": 10,
     "dish": { "_id": "dish-id", "name": "Pasta", "hall": "Epicuria" }
   }
 ]
 ```
 
-`group` is `liked`, `fine`, or `disliked`; an account with no ratings returns `[]`. The rating API is tracked in #22 and is not implemented in this branch. Until it is available, the profile shows a loading error with a retry button. Frontend tests mock this contract; verifying database persistence across logout and login requires that backend.
+`group` is `liked`, `fine`, or `disliked`; `position` is a nonnegative integer within the group, and `score` is a finite number from 0 to 10. An account with no ratings returns `[]`. The backend owns score calculation (liked: 7–10, fine: 4–6.9, disliked: 0–3.9). The rating and ranking APIs are tracked in #22 and #25 and are not implemented in this branch. Until the ranked response is available, the profile shows an error with a retry button. Frontend tests mock this contract; verifying real rankings and persistence across logout and login requires that backend.
 
 ## Folders
 
