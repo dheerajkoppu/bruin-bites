@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 function Hall() {
   const { hallName } = useParams();
@@ -19,7 +19,11 @@ function Hall() {
 
       {dishes.map((dish) => (
         <div key={dish._id}>
-          <h3>{dish.name}</h3>
+          <h3>
+            <Link to={"/dishes/" + dish._id}>
+              {dish.name}
+            </Link>
+          </h3>
 
           {dish.vegetarian && <p>Vegetarian</p>}
           {dish.vegan && <p>Vegan</p>}

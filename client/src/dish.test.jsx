@@ -29,7 +29,8 @@ function setupTest(loggedIn = true) {
         return Response.json({
           user: {
             _id: "user1",
-            username: "isaac"
+            username: "isaac",
+            email: "isaac@example.com"
           }
         });
       } else {
