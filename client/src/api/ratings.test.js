@@ -4,7 +4,7 @@ import { getMyRatings } from "./ratings.js";
 
 afterEach(() => mock.restoreAll());
 
-const rating = { group: "liked", dish: { _id: "dish-1", name: "Pasta", hall: "Epicuria" } };
+const rating = { group: "liked", position: 0, score: 10, dish: { _id: "dish-1", name: "Pasta", hall: "Epicuria" } };
 
 test("ratings are requested from the current session without caching", async () => {
   const fetchMock = mock.method(globalThis, "fetch", async () => Response.json([rating]));
@@ -41,4 +41,20 @@ test("aborted requests preserve the abort error", async () => {
   const error = new DOMException("Aborted", "AbortError");
   mock.method(globalThis, "fetch", async () => { throw error; });
   await assert.rejects(getMyRatings(), (caught) => caught === error);
+});
+
+for (const fields of [
+  { position: undefined }, { position: -1 }, { position: 0.5 }, { position: "0" },
+  { score: undefined }, { score: null }, { score: "8" }, { score: -1 }, { score: 11 },
+]) {
+  test(`invalid ranking fields are rejected: ${JSON.stringify(fields)}`, async () => {
+    mock.method(globalThis, "fetch", async () => Response.json([{ ...rating, ...fields }]));
+    await assert.rejects(getMyRatings(), /invalid ratings/);
+  });
+}
+
+test("a score of zero is a valid saved score", async () => {
+  const lowestRating = { ...rating, group: "disliked", score: 0 };
+  mock.method(globalThis, "fetch", async () => Response.json([lowestRating]));
+  assert.deepEqual(await getMyRatings(), [lowestRating]);
 });

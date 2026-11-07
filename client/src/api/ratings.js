@@ -21,6 +21,8 @@ export async function getMyRatings(signal) {
   const ratings = await response.json().catch(() => null);
   if (!Array.isArray(ratings) || ratings.some((rating) =>
     !rating || !groups.has(rating.group) ||
+    !Number.isInteger(rating.position) || rating.position < 0 ||
+    !Number.isFinite(rating.score) || rating.score < 0 || rating.score > 10 ||
     typeof rating.dish?._id !== "string" ||
     typeof rating.dish?.name !== "string" ||
     typeof rating.dish?.hall !== "string"
