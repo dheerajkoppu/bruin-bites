@@ -164,3 +164,25 @@ main {
 .rated-dish-name {
   font-weight: 600;
 }
+
+.ranked-dishes li {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.dish-rank {
+  color: #555;
+}
+
+.ranked-dish-details {
+  display: grid;
+  gap: 4px;
+}
+
+.dish-score {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #2774ae;
+}

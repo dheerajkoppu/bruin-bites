@@ -32,6 +32,7 @@ function ProfileRatings() {
   return (
     <section aria-labelledby="ratings-heading" className="profile-ratings">
       <h2 id="ratings-heading">My ratings</h2>
+      <p>Dishes are ranked from best to worst in each group. Scores are out of 10.</p>
       {!result && <p role="status">Loading your ratings…</p>}
       {result?.error && (
         <div>
@@ -45,19 +46,27 @@ function ProfileRatings() {
             <p>You haven't rated any dishes yet. <Link to="/">Explore dining halls</Link> to find a dish.</p>
           )}
           {groups.map(({ value, label }) => {
-            const ratings = result.ratings.filter((rating) => rating.group === value);
+            const ratings = result.ratings
+              .filter((rating) => rating.group === value)
+              .sort((a, b) => a.position - b.position);
             return (
               <section key={value} aria-labelledby={`ratings-${value}`} className="rating-group">
                 <h3 id={`ratings-${value}`}>{label} <span className="rating-count">({ratings.length})</span></h3>
                 {ratings.length === 0 ? <p>No dishes in this group yet.</p> : (
-                  <ul className="rated-dishes">
-                    {ratings.map(({ dish }) => (
+                  <ol className="rated-dishes ranked-dishes" role="list" aria-label={`${label} ranked dishes`}>
+                    {ratings.map(({ dish, score }, index) => (
                       <li key={dish._id}>
-                        <span className="rated-dish-name">{dish.name}</span>
-                        <Link to={"/halls/" + encodeURIComponent(dish.hall)}>{dish.hall}</Link>
+                        <span className="dish-rank" aria-hidden="true">{index + 1}.</span>
+                        <div className="ranked-dish-details">
+                          <span className="rated-dish-name">{dish.name}</span>
+                          <Link to={"/halls/" + encodeURIComponent(dish.hall)}>{dish.hall}</Link>
+                        </div>
+                        <span className="dish-score" aria-label={`Score: ${score.toFixed(1)} out of 10`}>
+                          {score.toFixed(1)} / 10
+                        </span>
                       </li>
                     ))}
-                  </ul>
+                  </ol>
                 )}
               </section>
             );
