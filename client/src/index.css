@@ -1,29 +1,110 @@
+:root {
+  --blue: #2774ae;
+  --blue-dark: #005587;
+  --blue-soft: #e8f1f8;
+  --gold: #ffd100;
+  --text: #1d2430;
+  --muted: #5d6675;
+  --border: #e3e7ed;
+  --background: #f6f8fb;
+  --surface: #fff;
+  --error: #b42318;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
+  --shadow-hover: 0 8px 24px rgb(16 24 40 / 12%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  color: #222;
-  background: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--background);
 }
 
 main {
-  max-width: 700px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 32px 16px 64px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+a {
+  color: var(--blue);
+}
+
+button {
+  padding: 8px 16px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--blue);
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--blue-dark);
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #ddd;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--blue);
+  box-shadow: var(--shadow);
 }
 
 .logo {
-  font-weight: bold;
-  font-size: 20px;
-  color: #2774ae;
+  font-weight: 800;
+  font-size: 22px;
+  color: white;
   text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.logo::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--gold);
 }
 
 .nav-links {
@@ -31,6 +112,17 @@ main {
   gap: 16px;
   align-items: center;
   flex-wrap: wrap;
+  color: white;
+}
+
+.nav-links > a {
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-links > a:hover {
+  text-decoration: underline;
 }
 
 .search-form {
@@ -38,19 +130,171 @@ main {
   gap: 6px;
 }
 
-.search-form input,
-.search-form button {
+.search-form input {
   min-width: 0;
-  padding: 6px 8px;
-  border: 1px solid #888;
-  border-radius: 6px;
+  width: 220px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
   font: inherit;
+}
+
+.search-form button {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--text);
+}
+
+.search-form button:hover:not(:disabled) {
+  background: #f2c500;
+}
+
+.nav-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: white;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.nav-button:hover:not(:disabled) {
+  background: transparent;
+}
+
+.page-subtitle {
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.hall-card,
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.hall-card {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.hall-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.hall-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+}
+
+.hall-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.hall-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.hall-cta {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.dish-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 24px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.filter-search {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.filter-bar select {
+  padding: 10px 12px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e7f6ec;
+  color: #1a7f37;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: 32px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  text-align: center;
 }
 
 .signup-card,
 .auth-card {
-  max-width: 400px;
+  max-width: 420px;
   margin: 32px auto;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .signup-form,
@@ -69,57 +313,45 @@ main {
 .auth-form input,
 .signup-form button,
 .auth-form button {
-  box-sizing: border-box;
   min-width: 0;
   width: 100%;
   padding: 12px;
-  border: 1px solid #888;
-  border-radius: 6px;
+  border-radius: 8px;
   font: inherit;
 }
 
 .signup-form input,
 .auth-form input {
   margin-bottom: 8px;
+  border: 1px solid var(--border);
 }
 
-.signup-form button,
-.auth-form button {
-  border-color: #2774ae;
-  background: #2774ae;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.nav-button {
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: #2774ae;
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.signup-form :focus-visible,
-.auth-form :focus-visible,
-.nav-button:focus-visible {
-  outline: 3px solid #2774ae;
-  outline-offset: 3px;
-}
-
-.signup-form :disabled,
-.auth-form :disabled,
-.nav-button:disabled {
+:disabled {
   opacity: 0.65;
   cursor: wait;
 }
 
 .form-error {
   margin: 0 0 8px;
-  color: #b42318;
+  color: var(--error);
   overflow-wrap: anywhere;
+}
+
+.nav-links .form-error {
+  color: #ffd7d3;
+}
+
+.profile-header {
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.profile-header p {
+  margin: 0;
+  color: var(--muted);
 }
 
 .profile-ratings {
@@ -128,9 +360,11 @@ main {
 
 .rating-group {
   margin: 16px 0;
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .rating-group h3 {
@@ -138,7 +372,7 @@ main {
 }
 
 .rating-count {
-  color: #555;
+  color: var(--muted);
   font-weight: normal;
 }
 
@@ -158,7 +392,7 @@ main {
 }
 
 .rated-dishes li + li {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
 }
 
 .rated-dish-name {
@@ -172,7 +406,7 @@ main {
 }
 
 .dish-rank {
-  color: #555;
+  color: var(--muted);
 }
 
 .ranked-dish-details {
@@ -181,8 +415,51 @@ main {
 }
 
 .dish-score {
-  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  color: #2774ae;
+}
+
+.compare {
+  text-align: center;
+}
+
+.compare-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.compare-choices button {
+  padding: 32px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.compare-choices button:hover:not(:disabled) {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 12px 16px;
+  }
+
+  .search-form,
+  .search-form input {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
 }

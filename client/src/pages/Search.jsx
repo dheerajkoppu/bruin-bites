@@ -32,22 +32,26 @@ function Search() {
     <div>
       <h1>Search</h1>
       {!query && (
-        <p>Use the search box at the top of the page to find a dish.</p>
+        <p className="page-subtitle">Use the search box at the top of the page to find a dish.</p>
       )}
       {current?.error && (
         <p className="form-error" role="alert">
           {current.error}
         </p>
       )}
-      {current?.dishes?.length === 0 && <p>No dishes found</p>}
-      {current?.dishes?.map((dish) => (
-        <div key={dish._id}>
-          <h3>{dish.name}</h3>
-          <Link to={"/halls/" + encodeURIComponent(dish.hall)}>
-            {dish.hall}
-          </Link>
-        </div>
-      ))}
+      {current?.dishes?.length === 0 && (
+        <p className="empty-state">No dishes found</p>
+      )}
+      <div className="card-grid">
+        {current?.dishes?.map((dish) => (
+          <div key={dish._id} className="dish-card">
+            <h3>{dish.name}</h3>
+            <Link to={"/halls/" + encodeURIComponent(dish.hall)}>
+              {dish.hall}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -70,14 +70,16 @@ function CompareDishes({ dish, group, onDone }) {
   const otherDish = rankedDishes[Math.floor((low + high) / 2)].dish;
 
   return (
-    <div>
+    <div className="compare">
       <h2>Which was better?</h2>
-      <button type="button" onClick={() => pick(true)}>
-        {dish.name}
-      </button>
-      <button type="button" onClick={() => pick(false)}>
-        {otherDish.name}
-      </button>
+      <div className="compare-choices">
+        <button type="button" onClick={() => pick(true)}>
+          {dish.name}
+        </button>
+        <button type="button" onClick={() => pick(false)}>
+          {otherDish.name}
+        </button>
+      </div>
     </div>
   );
 }

@@ -111,3 +111,7 @@ The live site uses its own database, `bruin-bites-prod`, in the same Atlas clust
 4. Put `Closes #<issue number>` in the PR description.
 5. Wait for the CI check on your PR to pass. It runs lint, tests, and the build in `client/`, and installs and syntax-checks `server/`. If it fails, click "Details" on the check to see why.
 6. Get one teammate to review before merging. Don't push straight to `main`.
+
+## Photo credits
+
+The Bruin Plate photo is [Carnesale Commons](https://commons.wikimedia.org/wiki/File:UCLA_Carnesale_Commons.jpg) by Yhz1221 on Wikimedia Commons (CC BY-SA 4.0).
