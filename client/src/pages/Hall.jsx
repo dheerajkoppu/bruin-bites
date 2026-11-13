@@ -36,33 +36,39 @@ function Hall() {
     <div>
       <h1>{hallName}</h1>
 
-      <label htmlFor="diet">Filter by diet: </label>
-      <select
-        id="diet"
-        value={selectedDiet}
-        onChange={(event) => setSelectedDiet(event.target.value)}
-      >
-        <option value="all">All dishes</option>
-        <option value="vegetarian">Vegetarian</option>
-        <option value="vegan">Vegan</option>
-        <option value="glutenFree">Gluten Free</option>
-      </select>
+      <div className="filter-bar">
+        <label htmlFor="diet">Filter by diet: </label>
+        <select
+          id="diet"
+          value={selectedDiet}
+          onChange={(event) => setSelectedDiet(event.target.value)}
+        >
+          <option value="all">All dishes</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+          <option value="glutenFree">Gluten Free</option>
+        </select>
+      </div>
 
       <h2>Dishes</h2>
 
       {visibleDishes.length === 0 && (
-        <p>No dishes match this filter.</p>
+        <p className="empty-state">No dishes match this filter.</p>
       )}
 
-      {visibleDishes.map((dish) => (
-        <div key={dish._id}>
-          <h3>{dish.name}</h3>
+      <div className="card-grid">
+        {visibleDishes.map((dish) => (
+          <div key={dish._id} className="dish-card">
+            <h3>{dish.name}</h3>
 
-          {dish.vegetarian && <p>Vegetarian</p>}
-          {dish.vegan && <p>Vegan</p>}
-          {dish.glutenFree && <p>Gluten Free</p>}
-        </div>
-      ))}
+            <div className="tags">
+              {dish.vegetarian && <span className="tag">Vegetarian</span>}
+              {dish.vegan && <span className="tag">Vegan</span>}
+              {dish.glutenFree && <span className="tag">Gluten Free</span>}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
