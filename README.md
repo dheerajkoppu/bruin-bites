@@ -114,4 +114,4 @@ The live site uses its own database, `bruin-bites-prod`, in the same Atlas clust
 
 ## Photo credits
 
-Dining hall photos are from Wikimedia Commons: [Carnesale Commons](https://commons.wikimedia.org/wiki/File:UCLA_Carnesale_Commons.jpg), [De Neve](https://commons.wikimedia.org/wiki/File:UCLA_De_Neve_2016-03-14.jpg), and [Covel](https://commons.wikimedia.org/wiki/File:UCLA_Covel_2015-08-04.jpg) by Yhz1221 (CC BY-SA 4.0), and [Rieber Terrace](https://commons.wikimedia.org/wiki/File:Rieber_Terrace,_UCLA.jpg) by Nikkul (CC BY-SA 3.0).
+The Bruin Plate photo is [Carnesale Commons](https://commons.wikimedia.org/wiki/File:UCLA_Carnesale_Commons.jpg) by Yhz1221 on Wikimedia Commons (CC BY-SA 4.0).
