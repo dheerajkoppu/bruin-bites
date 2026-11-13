@@ -174,6 +174,7 @@ select {
   margin-top: 16px;
 }
 
+.hall-card,
 .dish-card {
   display: flex;
   flex-direction: column;
@@ -183,6 +184,44 @@ select {
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow);
+}
+
+.hall-card {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.hall-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.hall-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+}
+
+.hall-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.hall-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.hall-cta {
+  color: var(--blue);
+  font-weight: 600;
 }
 
 .dish-card h3 {
