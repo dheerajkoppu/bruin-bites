@@ -6,9 +6,11 @@ function Hall() {
   const { hallName } = useParams();
   const [dishes, setDishes] = useState([]);
   const [selectedDiet, setSelectedDiet] = useState("all");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     setSelectedDiet("all");
+    setSearchText("");
 
     fetch("/api/halls/" + encodeURIComponent(hallName) + "/dishes")
       .then((response) => response.json())
@@ -20,6 +22,10 @@ function Hall() {
 
   for (let i = 0; i < dishes.length; i++) {
     const dish = dishes[i];
+
+    if (!dish.name.toLowerCase().includes(searchText.trim().toLowerCase())) {
+      continue;
+    }
 
     if (selectedDiet === "all") {
       visibleDishes.push(dish);
@@ -37,7 +43,15 @@ function Hall() {
       <h1>{hallName}</h1>
 
       <div className="filter-bar">
-        <label htmlFor="diet">Filter by diet: </label>
+        <input
+          type="search"
+          className="filter-search"
+          aria-label="Search this menu"
+          placeholder={"Search " + hallName + "'s menu"}
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+        <label htmlFor="diet" className="visually-hidden">Filter by diet:</label>
         <select
           id="diet"
           value={selectedDiet}
@@ -53,7 +67,7 @@ function Hall() {
       <h2>Dishes</h2>
 
       {visibleDishes.length === 0 && (
-        <p className="empty-state">No dishes match this filter.</p>
+        <p className="empty-state">No dishes match your search or filter.</p>
       )}
 
       <div className="card-grid">
