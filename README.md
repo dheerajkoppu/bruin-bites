@@ -2,6 +2,8 @@
 
 Rank the food at the UCLA dining halls. CS 35L, Fall 2026.
 
+**Live site:** https://bruin-bites.onrender.com
+
 **Team:** Abhinav Garg, Dheeraj Koppu, Sampath Kalagarla, Ved Vyas, Isaac Pan
 
 Built with React (Vite), Express, and MongoDB.
