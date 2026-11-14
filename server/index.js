@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.js";
 import { createSession } from "./session.js";
 import Rating from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
+import { group } from "node:console";
 
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
@@ -17,8 +18,22 @@ app.use(createSession());
 
 function escapeRegExp(string) {
   // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const groupRanges = {
+  liked: { low: 7, high: 10 },
+  fine: { low: 4, high: 6.9 },
+  disliked: { low: 0, high: 3.9 },
+};
+
+function scoreFor(position, groupSize, low, high) {
+  if (groupSize === 1) {
+    return high; // If there's only one item in the group, it gets the highest score
   }
+  const step = (high - low) / (groupSize - 1);
+  return Math.round((high - position * step) * 10) / 10;
+}
 
 app.get("/api/health", (request, response) => {
   response.json({ status: "ok" });
@@ -79,8 +94,19 @@ app.get("/api/dishes", async (request, response) => {
 
 app.get("/api/ratings/me", requireLogin, async (request, response) => {
   try {
-    const ratings = await Rating.find({ user: request.session.userId }).populate("dish");
-    response.json(ratings);
+    const ratings = await Rating.find({ user: request.session.userId })
+      .populate("dish")
+      .sort({ position: 1 })
+      .lean();
+    const groupSizes = { liked: 0, fine: 0, disliked: 0 };
+    for (const rating of ratings) {
+      groupSizes[rating.group]++;
+    }
+    const withScores = ratings.map((rating) => {
+      const { low, high } = groupRanges[rating.group];
+      return { ...rating, score: scoreFor(rating.position, groupSizes[rating.group], low, high) };
+    });
+    response.json(withScores);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
@@ -113,7 +139,7 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
       dish: dishId,
     });
 
-       // 1. Re-rating? Close the gap it leaves in its old group
+    // 1. Re-rating? Close the gap it leaves in its old group
     if (existingRating) {
       await Rating.updateMany(
         { user: request.session.userId, group: existingRating.group, position: { $gt: existingRating.position } },
@@ -143,7 +169,7 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
       position,
     });
     await newRating.save();
-    response.status(201).json(newRating); 
+    response.status(201).json(newRating);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
