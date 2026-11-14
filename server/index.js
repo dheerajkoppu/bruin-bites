@@ -6,6 +6,9 @@ import Dish from "./models/Dish.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import { createSession } from "./session.js";
+import Rating from "./models/Rating.js";
+import { requireLogin } from "./middleware/requireLogin.js";
+import { group } from "node:console";
 
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
@@ -15,8 +18,22 @@ app.use(createSession());
 
 function escapeRegExp(string) {
   // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const groupRanges = {
+  liked: { low: 7, high: 10 },
+  fine: { low: 4, high: 6.9 },
+  disliked: { low: 0, high: 3.9 },
+};
+
+function scoreFor(position, groupSize, low, high) {
+  if (groupSize === 1) {
+    return high; // If there's only one item in the group, it gets the highest score
   }
+  const step = (high - low) / (groupSize - 1);
+  return Math.round((high - position * step) * 10) / 10;
+}
 
 app.get("/api/health", (request, response) => {
   response.json({ status: "ok" });
@@ -69,6 +86,90 @@ app.get("/api/dishes", async (request, response) => {
     const regex = new RegExp(escaped, "i");
     const dishes = await Dish.find({ name: { $regex: regex } });
     response.json(dishes);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/api/ratings/me", requireLogin, async (request, response) => {
+  try {
+    const ratings = await Rating.find({ user: request.session.userId })
+      .populate("dish")
+      .sort({ position: 1 })
+      .lean();
+    const groupSizes = { liked: 0, fine: 0, disliked: 0 };
+    for (const rating of ratings) {
+      groupSizes[rating.group]++;
+    }
+    const withScores = ratings.map((rating) => {
+      const { low, high } = groupRanges[rating.group];
+      return { ...rating, score: scoreFor(rating.position, groupSizes[rating.group], low, high) };
+    });
+    response.json(withScores);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/api/ratings", requireLogin, async (request, response) => {
+  try {
+    const { dishId, group, position } = request.body;
+
+    if (!mongoose.Types.ObjectId.isValid(dishId)) {
+      return response.status(400).json({ error: "Invalid dish ID" });
+    }
+
+    if (!Number.isInteger(position) || position < 0) {
+      return response.status(400).json({ error: "Position must be a non-negative integer" });
+    }
+
+    const dish = await Dish.findById(dishId);
+    if (!dish) {
+      return response.status(404).json({ error: "Dish not found" });
+    }
+
+    if (!["liked", "fine", "disliked"].includes(group)) {
+      return response.status(400).json({ error: "Invalid rating group" });
+    }
+
+    const existingRating = await Rating.findOne({
+      user: request.session.userId,
+      dish: dishId,
+    });
+
+    // 1. Re-rating? Close the gap it leaves in its old group
+    if (existingRating) {
+      await Rating.updateMany(
+        { user: request.session.userId, group: existingRating.group, position: { $gt: existingRating.position } },
+        { $inc: { position: -1 } }
+      );
+    }
+
+    // 2. Make room in the new group
+    await Rating.updateMany(
+      { user: request.session.userId, group, position: { $gte: position } },
+      { $inc: { position: 1 } }
+    );
+
+    // 3a. Re-rating: move it to its new spot
+    if (existingRating) {
+      existingRating.group = group;
+      existingRating.position = position;
+      await existingRating.save();
+      return response.json(existingRating);
+    }
+
+    // 3b. New rating: create it at its spot
+    const newRating = new Rating({
+      user: request.session.userId,
+      dish: dishId,
+      group,
+      position,
+    });
+    await newRating.save();
+    response.status(201).json(newRating);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
