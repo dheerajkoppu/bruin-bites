@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 function Hall() {
   const { hallName } = useParams();
@@ -73,7 +73,11 @@ function Hall() {
       <div className="card-grid">
         {visibleDishes.map((dish) => (
           <div key={dish._id} className="dish-card">
-            <h3>{dish.name}</h3>
+            <h3>
+              <Link to={"/dishes/" + dish._id}>
+                {dish.name}
+              </Link>
+            </h3>
 
             <div className="tags">
               {dish.vegetarian && <span className="tag">Vegetarian</span>}
