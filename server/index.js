@@ -77,6 +77,16 @@ app.get("/api/dishes", async (request, response) => {
   }
 });
 
+app.get("/api/ratings/me", requireLogin, async (request, response) => {
+  try {
+    const ratings = await Rating.find({ user: request.session.userId }).populate("dish");
+    response.json(ratings);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.post("/api/ratings", requireLogin, async (request, response) => {
   try {
     const { dishId, group } = request.body;
