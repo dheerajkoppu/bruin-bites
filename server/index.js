@@ -89,10 +89,14 @@ app.get("/api/ratings/me", requireLogin, async (request, response) => {
 
 app.post("/api/ratings", requireLogin, async (request, response) => {
   try {
-    const { dishId, group } = request.body;
+    const { dishId, group, position } = request.body;
 
     if (!mongoose.Types.ObjectId.isValid(dishId)) {
       return response.status(400).json({ error: "Invalid dish ID" });
+    }
+
+    if (!Number.isInteger(position) || position < 0) {
+      return response.status(400).json({ error: "Position must be a non-negative integer" });
     }
 
     const dish = await Dish.findById(dishId);
@@ -109,20 +113,37 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
       dish: dishId,
     });
 
+       // 1. Re-rating? Close the gap it leaves in its old group
+    if (existingRating) {
+      await Rating.updateMany(
+        { user: request.session.userId, group: existingRating.group, position: { $gt: existingRating.position } },
+        { $inc: { position: -1 } }
+      );
+    }
+
+    // 2. Make room in the new group
+    await Rating.updateMany(
+      { user: request.session.userId, group, position: { $gte: position } },
+      { $inc: { position: 1 } }
+    );
+
+    // 3a. Re-rating: move it to its new spot
     if (existingRating) {
       existingRating.group = group;
+      existingRating.position = position;
       await existingRating.save();
       return response.json(existingRating);
     }
 
+    // 3b. New rating: create it at its spot
     const newRating = new Rating({
       user: request.session.userId,
       dish: dishId,
       group,
+      position,
     });
-
     await newRating.save();
-    response.status(201).json(newRating);
+    response.status(201).json(newRating); 
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
