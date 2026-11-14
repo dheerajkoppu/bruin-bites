@@ -6,6 +6,8 @@ import Dish from "./models/Dish.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import { createSession } from "./session.js";
+import Rating from "./models/Rating.js";
+import { requireLogin } from "./middleware/requireLogin.js";
 
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
@@ -69,6 +71,48 @@ app.get("/api/dishes", async (request, response) => {
     const regex = new RegExp(escaped, "i");
     const dishes = await Dish.find({ name: { $regex: regex } });
     response.json(dishes);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/api/ratings", requireLogin, async (request, response) => {
+  try {
+    const { dishId, group } = request.body;
+
+    if (!mongoose.Types.ObjectId.isValid(dishId)) {
+      return response.status(400).json({ error: "Invalid dish ID" });
+    }
+
+    const dish = await Dish.findById(dishId);
+    if (!dish) {
+      return response.status(404).json({ error: "Dish not found" });
+    }
+
+    if (!["liked", "fine", "disliked"].includes(group)) {
+      return response.status(400).json({ error: "Invalid rating group" });
+    }
+
+    const existingRating = await Rating.findOne({
+      user: request.session.userId,
+      dish: dishId,
+    });
+
+    if (existingRating) {
+      existingRating.group = group;
+      await existingRating.save();
+      return response.json(existingRating);
+    }
+
+    const newRating = new Rating({
+      user: request.session.userId,
+      dish: dishId,
+      group,
+    });
+
+    await newRating.save();
+    response.status(201).json(newRating);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
