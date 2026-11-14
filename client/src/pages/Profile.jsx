@@ -18,9 +18,11 @@ function Profile() {
 
   return (
     <div>
-      <h1>My Profile</h1>
-      <p>Welcome, {user.username}!</p>
-      <p>{user.email}</p>
+      <div className="profile-header">
+        <h1>My Profile</h1>
+        <p>Welcome, {user.username}!</p>
+        <p>{user.email}</p>
+      </div>
       <ProfileRatings key={user._id || user.email} />
     </div>
   );
