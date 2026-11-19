@@ -55,6 +55,10 @@ Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. 
 | `POST /api/auth/logout` | 204, clears cookie | |
 | `GET /api/auth/me` | `200 { user }` | 401 not logged in |
 
+### Top dishes
+
+`GET /api/halls/:hallName/top` returns up to 10 dishes from that hall, each with `averageScore` and `rankingCount`, sorted by average score across every user's rankings from the last 7 days. Dishes with fewer than 3 rankings in that window are left out, so the list is `[]` until a hall has enough rankings.
+
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
 
 ### Profile ratings
