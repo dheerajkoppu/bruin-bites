@@ -6,7 +6,7 @@ import Dish from "./models/Dish.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import { createSession } from "./session.js";
-import Rating from "./models/Rating.js";
+import Rating, { scoreFor } from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
 import { group } from "node:console";
 
@@ -21,19 +21,9 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-const groupRanges = {
-  liked: { low: 7, high: 10 },
-  fine: { low: 4, high: 6.9 },
-  disliked: { low: 0, high: 3.9 },
-};
-
-function scoreFor(position, groupSize, low, high) {
-  if (groupSize === 1) {
-    return high; // If there's only one item in the group, it gets the highest score
-  }
-  const step = (high - low) / (groupSize - 1);
-  return Math.round((high - position * step) * 10) / 10;
-}
+const TOP_DISHES_LIMIT = 10;
+const TOP_DISHES_MIN_RANKINGS = 3;
+const TOP_DISHES_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
 app.get("/api/health", (request, response) => {
   response.json({ status: "ok" });
@@ -59,6 +49,37 @@ app.get("/api/halls/:hallName/dishes", async (request, response) => {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+app.get("/api/halls/:hallName/top", async (request, response) => {
+  const regex = new RegExp(`^${escapeRegExp(request.params.hallName)}$`, "i");
+  const dishes = await Dish.find({ hall: { $regex: regex } });
+  const since = new Date(Date.now() - TOP_DISHES_WINDOW_MS);
+  const recent = await Rating.find({ dish: { $in: dishes.map((dish) => dish._id) }, updatedAt: { $gte: since } });
+
+  // A rating's score depends on how many dishes its owner has in that group.
+  const groupSizes = await Rating.aggregate([
+    { $match: { user: { $in: recent.map((rating) => rating.user) } } },
+    { $group: { _id: { user: "$user", group: "$group" }, count: { $sum: 1 } } },
+  ]);
+  const sizeOf = new Map(groupSizes.map(({ _id, count }) => [`${_id.user}:${_id.group}`, count]));
+
+  const totals = new Map();
+  for (const rating of recent) {
+    const score = scoreFor(rating.group, rating.position, sizeOf.get(`${rating.user}:${rating.group}`));
+    const total = totals.get(String(rating.dish)) ?? { sum: 0, count: 0 };
+    totals.set(String(rating.dish), { sum: total.sum + score, count: total.count + 1 });
+  }
+
+  const top = dishes
+    .filter((dish) => (totals.get(dish.id)?.count ?? 0) >= TOP_DISHES_MIN_RANKINGS)
+    .map((dish) => {
+      const { sum, count } = totals.get(dish.id);
+      return { ...dish.toJSON(), averageScore: Math.round((sum / count) * 10) / 10, rankingCount: count };
+    })
+    .sort((a, b) => b.averageScore - a.averageScore)
+    .slice(0, TOP_DISHES_LIMIT);
+  response.json(top);
 });
 
 app.get("/api/dishes/:dishId", async (request, response) => {
@@ -102,10 +123,10 @@ app.get("/api/ratings/me", requireLogin, async (request, response) => {
     for (const rating of ratings) {
       groupSizes[rating.group]++;
     }
-    const withScores = ratings.map((rating) => {
-      const { low, high } = groupRanges[rating.group];
-      return { ...rating, score: scoreFor(rating.position, groupSizes[rating.group], low, high) };
-    });
+    const withScores = ratings.map((rating) => ({
+      ...rating,
+      score: scoreFor(rating.group, rating.position, groupSizes[rating.group]),
+    }));
     response.json(withScores);
   } catch (error) {
     console.error(error);
@@ -143,14 +164,16 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
     if (existingRating) {
       await Rating.updateMany(
         { user: request.session.userId, group: existingRating.group, position: { $gt: existingRating.position } },
-        { $inc: { position: -1 } }
+        { $inc: { position: -1 } },
+        { timestamps: false }
       );
     }
 
     // 2. Make room in the new group
     await Rating.updateMany(
       { user: request.session.userId, group, position: { $gte: position } },
-      { $inc: { position: 1 } }
+      { $inc: { position: 1 } },
+      { timestamps: false }
     );
 
     // 3a. Re-rating: move it to its new spot
