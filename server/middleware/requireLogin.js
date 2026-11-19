@@ -1,6 +1,8 @@
-export function requireLogin(request, response, next) {
-    if(!request.session.userId) {
-        return response.status(401).json({ error: "You must be logged in" });
-    }
-    next();
+import { HttpError } from "./errorHandler.js";
+
+export function requireLogin(request, _response, next) {
+  if (!request.session.userId) {
+    throw new HttpError(401, "Not logged in.");
+  }
+  next();
 }

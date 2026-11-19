@@ -55,9 +55,15 @@ Login state is an HttpOnly session cookie; fetch with `credentials: "include"`. 
 | `POST /api/auth/logout` | 204, clears cookie | |
 | `GET /api/auth/me` | `200 { user }` | 401 not logged in |
 
-### Top dishes
+### Photo API
 
-`GET /api/halls/:hallName/top` returns up to 10 dishes from that hall, each with `averageScore` and `rankingCount`, sorted by average score across every user's rankings from the last 7 days. Dishes with fewer than 3 rankings in that window are left out, so the list is `[]` until a hall has enough rankings.
+| Request | Success | Errors |
+|---|---|---|
+| `POST /api/dishes/:id/photos`, multipart with one JPG or PNG under 5 MB in the `photo` field | `201 { photo }` | 400 wrong type or too big, 401 not logged in, 404 no such dish |
+| `GET /api/dishes/:id` | dish plus `photos: [{ _id, url, contentType, createdAt }]`, newest first | 404 |
+| `GET /api/photos/:id` | the image bytes | 404 |
+
+Photos are stored in MongoDB (the `photos` collection), so every server that shares the database sees them. `url` points at `GET /api/photos/:id`.
 
 Run `npm test`, `npm run lint`, and `npm run build` in `client/` to check the frontend. The API tests mock responses and do not require MongoDB or a running backend.
 
