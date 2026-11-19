@@ -3,8 +3,10 @@ import express from "express";
 import mongoose from "mongoose";
 import path from "node:path";
 import Dish from "./models/Dish.js";
+import Photo from "./models/Photo.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
+import photosRouter from "./routes/photos.js";
 import { createSession } from "./session.js";
 
 const app = express();
@@ -53,7 +55,8 @@ app.get("/api/dishes/:dishId", async (request, response) => {
     if (!dish) {
       return response.status(404).json({ error: "Dish not found" });
     }
-    response.json(dish);
+    const photos = await Photo.find({ dish }).sort({ createdAt: -1 });
+    response.json({ ...dish.toJSON(), photos });
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
@@ -76,6 +79,7 @@ app.get("/api/dishes", async (request, response) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api", photosRouter);
 
 // Serve the built React app so the site and the API share one domain in production
 const clientBuildDirectory = path.join(import.meta.dirname, "..", "client", "dist");
