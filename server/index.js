@@ -11,12 +11,14 @@ import { createSession } from "./session.js";
 import Rating, { scoreFor } from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
 import { group } from "node:console";
+import usersRouter from "./routes/users.js";
 
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(createSession());
+app.use("/api/users", usersRouter);
 
 function escapeRegExp(string) {
   // Matches characters: . * + ? ^ $ { } ( ) [ ] | \

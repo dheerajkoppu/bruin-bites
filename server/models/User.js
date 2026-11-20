@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters."],
       select: false,
     },
+    following: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
   {
     timestamps: true,
