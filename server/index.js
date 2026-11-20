@@ -12,6 +12,7 @@ import Rating, { scoreFor } from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
 import { group } from "node:console";
 import usersRouter from "./routes/users.js";
+import { rankedRatingsFor } from "./models/Rating.js";
 
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
@@ -120,19 +121,8 @@ app.get("/api/dishes", async (request, response) => {
 
 app.get("/api/ratings/me", requireLogin, async (request, response) => {
   try {
-    const ratings = await Rating.find({ user: request.session.userId })
-      .populate("dish")
-      .sort({ position: 1 })
-      .lean();
-    const groupSizes = { liked: 0, fine: 0, disliked: 0 };
-    for (const rating of ratings) {
-      groupSizes[rating.group]++;
-    }
-    const withScores = ratings.map((rating) => ({
-      ...rating,
-      score: scoreFor(rating.group, rating.position, groupSizes[rating.group]),
-    }));
-    response.json(withScores);
+    const ratings = await rankedRatingsFor(request.session.userId);
+    response.json(ratings);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
