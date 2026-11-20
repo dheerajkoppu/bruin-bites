@@ -45,4 +45,17 @@ router.delete("/:username/follow", requireLogin, async (req, res) => {
 }
 );
 
+router.get("/me/following", requireLogin, async (req, res) => {
+    const userId = req.session.userId;
+
+    const user = await User.findById(userId).populate("following", "username");
+
+    if (!user) {
+        throw new HttpError(404, "User not found");
+    }
+
+    res.status(200).json({ following: user.following });
+}
+);
+
 export default router;
