@@ -1,6 +1,6 @@
 
 import { afterEach, expect, test, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import App from "./App.jsx";
@@ -10,7 +10,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("searches for a friend by username", async () => {
+test("searches for a friend by username and follows them", async () => {
   // Fake API responses for testing
   const fakeFetch = vi.fn(async (url) => {
     if (url === "/api/auth/me") {
@@ -35,7 +35,11 @@ test("searches for a friend by username", async () => {
         }
       ]);
     }
-
+    if (url === "/api/users/sambruin/follow") {
+        return Response.json({
+            message: "You are now following sambruin"
+        });
+    }
     throw new Error("Unexpected request: " + url);
   });
 
@@ -73,4 +77,31 @@ test("searches for a friend by username", async () => {
       credentials: "include"
     })
   );
+
+
+  // Click the Follow button
+  await userEvent.click(
+    screen.getByRole("button", {
+      name: "Follow sambruin"
+    })
+  );
+
+  // Check that a POST request was sent
+  await waitFor(() => {
+    expect(fakeFetch).toHaveBeenCalledWith(
+      "/api/users/sambruin/follow",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include"
+      })
+    );
+  });
+
+  // Check that the button changes after following
+  expect(
+    await screen.findByRole("button", {
+      name: "Following sambruin"
+    })
+  ).toBeTruthy();
+
 });

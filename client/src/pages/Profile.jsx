@@ -1,6 +1,7 @@
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
+import FindFriends from "../components/FindFriends.jsx";
 
 function Profile() {
   const { user, isLoading, sessionError, restoreSession } = useAuth();
@@ -24,6 +25,8 @@ function Profile() {
         <p>{user.email}</p>
       </div>
       <ProfileRatings key={user._id || user.email} />
+
+      <FindFriends />
     </div>
   );
 }
