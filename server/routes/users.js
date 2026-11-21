@@ -2,6 +2,7 @@ import { Router } from "express";
 import { HttpError } from "../middleware/errorHandler.js";
 import { requireLogin } from "../middleware/requireLogin.js";
 import User from "../models/User.js";
+import { rankedRatingsFor } from "../models/Rating.js";
 
 const router = Router();
 
@@ -55,6 +56,24 @@ router.get("/me/following", requireLogin, async (req, res) => {
     }
 
     res.status(200).json({ following: user.following });
+}
+);
+
+router.get("/:username/ratings", requireLogin, async (req, res) => {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+        throw new HttpError(404, "User not found");
+    }
+
+    if (!user._id.equals(req.session.userId) && !await User.exists({ _id: req.session.userId, following: user._id })) {
+        throw new HttpError(403, "You are not allowed to view this user's ratings");
+    }
+
+    const ratings = await rankedRatingsFor(user._id);
+    res.json(ratings);
 }
 );
 
