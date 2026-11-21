@@ -42,6 +42,10 @@ function setupTest(loggedIn = true) {
       return Response.json(dish);
     }
 
+    if (url === "/api/ratings/me") {  
+      return Response.json([]);
+    }
+
     if (url === "/api/ratings") {
       if (options.method === "POST") {
         return Response.json({ success: true });
@@ -118,7 +122,8 @@ test("saves a liked rating", async () => {
         method: "POST",
         body: JSON.stringify({
           dishId: dish._id,
-          group: "liked"
+          group: "liked",
+          position: 0
         })
       })
     );
