@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../context/useAuth.js";
+import CompareDishes from "../components/CompareDishes.jsx";
 
 function Dish() {
   const { id } = useParams();
@@ -11,7 +12,7 @@ function Dish() {
   const [dish, setDish] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   useEffect(() => {
   let ignore = false;
@@ -49,48 +50,18 @@ function Dish() {
   };
 }, [id]);
 
-  async function saveRating(group) {
-    if (isLoading || saving) {
+  function startRating(group) {
+    if (isLoading) {
       return;
     }
 
-    if (user === null) {
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    setSaving(true);
     setMessage("");
-
-    try {
-      const response = await fetch("/api/ratings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          dishId: id,
-          group: group
-        })
-      });
-
-      if (response.status === 401) {
-        navigate("/login");
-        return;
-      }
-
-      if (!response.ok) {
-        setMessage("Could not save your rating.");
-        return;
-      }
-
-      setMessage("Rating saved!");
-    } catch {
-      setMessage("Could not connect to the server.");
-    } finally {
-      setSaving(false);
-    }
+    setSelectedGroup(group);
   }
 
   if (error !== "") {
@@ -111,30 +82,43 @@ function Dish() {
       {dish.vegan && <p>Vegan</p>}
       {dish.glutenFree && <p>Gluten Free</p>}
 
+      
       <h2>Rate this dish</h2>
 
       <button
-        disabled={saving || isLoading}
-        onClick={() => saveRating("liked")}
+        disabled={isLoading || selectedGroup !== null}
+        onClick={() => startRating("liked")}
       >
         Liked it
       </button>
 
       <button
-        disabled={saving || isLoading}
-        onClick={() => saveRating("fine")}
+        disabled={isLoading || selectedGroup !== null}
+        onClick={() => startRating("fine")}
       >
         It was fine
       </button>
 
       <button
-        disabled={saving || isLoading}
-        onClick={() => saveRating("disliked")}
+        disabled={isLoading || selectedGroup !== null}
+        onClick={() => startRating("disliked")}
       >
         Didn't like it
       </button>
 
+      {selectedGroup !== null && (
+        <CompareDishes
+          dish={dish}
+          group={selectedGroup}
+          onDone={() => {
+            setSelectedGroup(null);
+            setMessage("Rating saved!");
+          }}
+        />
+      )}
+
       {message !== "" && <p role="status">{message}</p>}
+
     </div>
   );
 }
