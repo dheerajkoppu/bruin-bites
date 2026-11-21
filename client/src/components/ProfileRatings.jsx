@@ -8,21 +8,57 @@ const groups = [
   { value: "disliked", label: "Didn't like it" },
 ];
 
-function ProfileRatings() {
+function ProfileRatings({ username }) {
   const [result, setResult] = useState(null);
   const [attempt, setAttempt] = useState(0);
 
+
   useEffect(() => {
     const controller = new AbortController();
-    getMyRatings(controller.signal)
-      .then((ratings) => {
-        if (!controller.signal.aborted) setResult({ ratings });
-      })
-      .catch((error) => {
-        if (!controller.signal.aborted) setResult({ error: error.message });
-      });
-    return () => controller.abort();
-  }, [attempt]);
+
+    async function loadRatings() {
+      try {
+        let ratings;
+
+        if (username) {
+          // Load a friend's ratings
+          const response = await fetch(
+            "/api/users/" +
+              encodeURIComponent(username) +
+              "/ratings",
+            {
+              credentials: "include",
+              signal: controller.signal
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Could not load this user's ratings.");
+          }
+
+          ratings = await response.json();
+        } else {
+          // Load our own ratings
+          ratings = await getMyRatings(controller.signal);
+        }
+
+        if (!controller.signal.aborted) {
+          setResult({ ratings });
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setResult({ error: error.message });
+        }
+      }
+    }
+
+    loadRatings();
+
+    return () => {
+      controller.abort();
+    };
+  }, [attempt, username]);
+
 
   function retry() {
     setResult(null);
@@ -31,7 +67,7 @@ function ProfileRatings() {
 
   return (
     <section aria-labelledby="ratings-heading" className="profile-ratings">
-      <h2 id="ratings-heading">My ratings</h2>
+      <h2 id="ratings-heading"> {username ? "Ranked dishes" : "My ratings"} </h2>
       <p>Dishes are ranked from best to worst in each group. Scores are out of 10.</p>
       {!result && <p role="status">Loading your ratings…</p>}
       {result?.error && (
@@ -43,7 +79,14 @@ function ProfileRatings() {
       {result?.ratings && (
         <>
           {result.ratings.length === 0 && (
-            <p>You haven't rated any dishes yet. <Link to="/">Explore dining halls</Link> to find a dish.</p>
+            username ? (
+              <p>This user hasn't rated any dishes yet.</p>
+            ) : (
+              <p>
+                You haven't rated any dishes yet.{" "}
+                <Link to="/">Explore dining halls</Link> to find a dish.
+              </p>
+            )
           )}
           {groups.map(({ value, label }) => {
             const ratings = result.ratings

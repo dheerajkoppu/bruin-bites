@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 function FollowingList() {
   const [following, setFollowing] = useState([]);
@@ -83,7 +84,9 @@ function FollowingList() {
 
       {following.map((person) => (
         <div key={person._id}>
-          <span>{person.username}</span>
+          <Link to={"/users/" + encodeURIComponent(person.username)}>
+            {person.username}
+          </Link>
 
           <button
             type="button"
