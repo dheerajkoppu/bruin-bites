@@ -190,3 +190,69 @@ test("shows followed users and lets you unfollow", async () => {
     ).toBeNull();
   });
 });
+
+
+
+test("shows a friend's ranked dishes", async () => {
+  const fakeFetch = vi.fn(async (url) => {
+    if (url === "/api/auth/me") {
+      return Response.json({
+        user: {
+          _id: "user1",
+          username: "isaac",
+          email: "isaac@example.com"
+        }
+      });
+    }
+
+    if (url === "/api/users/sambruin/ratings") {
+      return Response.json([
+        {
+          _id: "rating1",
+          group: "liked",
+          position: 0,
+          score: 10,
+          dish: {
+            _id: "dish1",
+            name: "Pesto Pasta",
+            hall: "Bruin Plate"
+          }
+        }
+      ]);
+    }
+
+    throw new Error("Unexpected request: " + url);
+  });
+
+  vi.stubGlobal("fetch", fakeFetch);
+
+  // Open our friend's profile page
+  render(
+    <MemoryRouter initialEntries={["/users/sambruin"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  // Check that the friend's name appears
+  expect(
+    await screen.findByRole("heading", {
+      name: "sambruin's ratings"
+    })
+  ).toBeTruthy();
+
+  // Check that their rated dish appears
+  expect(await screen.findByText("Pesto Pasta")).toBeTruthy();
+
+  // Check the score
+  expect(
+    screen.getByLabelText("Score: 10.0 out of 10")
+  ).toBeTruthy();
+
+  // Check that we requested the correct user's ratings
+  expect(fakeFetch).toHaveBeenCalledWith(
+    "/api/users/sambruin/ratings",
+    expect.objectContaining({
+      credentials: "include"
+    })
+  );
+});
