@@ -40,6 +40,13 @@ test("searches for a friend by username and follows them", async () => {
             message: "You are now following sambruin"
         });
     }
+
+    if (url === "/api/users/me/following") {
+        return Response.json({
+            following: []
+        });
+    }
+
     throw new Error("Unexpected request: " + url);
   });
 

@@ -20,6 +20,7 @@ function mockApi({ session = () => Response.json({ user: account }), getRatings 
   const fetchMock = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") return session();
     if (url === "/api/ratings/me") return getRatings(options);
+    if (url === "/api/users/me/following") return Response.json({ following: [] });
     if (url === "/api/auth/logout") return new Response(null, { status: 204 });
     if (url === "/api/auth/login") return Response.json({ user: login });
     throw new Error(`Unexpected request: ${url}`);
