@@ -105,3 +105,81 @@ test("searches for a friend by username and follows them", async () => {
   ).toBeTruthy();
 
 });
+
+
+
+test("shows followed users and lets you unfollow", async () => {
+  const fakeFetch = vi.fn(async (url) => {
+    if (url === "/api/auth/me") {
+      return Response.json({
+        user: {
+          _id: "user1",
+          username: "isaac",
+          email: "isaac@example.com"
+        }
+      });
+    }
+
+    if (url === "/api/ratings/me") {
+      return Response.json([]);
+    }
+
+    if (url === "/api/users/me/following") {
+      return Response.json({
+        following: [
+          {
+            _id: "user2",
+            username: "sambruin"
+          }
+        ]
+      });
+    }
+
+    if (url === "/api/users/sambruin/follow") {
+      return Response.json({
+        message: "You have unfollowed sambruin"
+      });
+    }
+
+    throw new Error("Unexpected request: " + url);
+  });
+
+  vi.stubGlobal("fetch", fakeFetch);
+
+  // Open the profile page
+  render(
+    <MemoryRouter initialEntries={["/profile"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  // Check that the followed user appears
+  expect(await screen.findByText("sambruin")).toBeTruthy();
+
+  const unfollowButton = screen.getByRole("button", {
+    name: "Unfollow sambruin"
+  });
+
+  // Click Unfollow
+  await userEvent.click(unfollowButton);
+
+  // Check that the DELETE request was sent
+  await waitFor(() => {
+    expect(fakeFetch).toHaveBeenCalledWith(
+      "/api/users/sambruin/follow",
+      expect.objectContaining({
+        method: "DELETE",
+        credentials: "include"
+      })
+    );
+  });
+
+  // Check that the unfollow button disappears
+  await waitFor(() => {
+    expect(
+      screen.queryByRole("button", {
+        name: "Unfollow sambruin"
+      })
+    ).toBeNull();
+  });
+});
