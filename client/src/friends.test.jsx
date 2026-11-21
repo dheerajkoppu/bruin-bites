@@ -340,3 +340,43 @@ test("following someone updates the following list", async () => {
     })
   ).toBeTruthy();
 });
+
+
+test("redirects logged-out users from a friend's profile", async () => {
+  const fakeFetch = vi.fn(async (url) => {
+    // The visitor is not logged in
+    if (url === "/api/auth/me") {
+      return new Response(null, { status: 401 });
+    }
+
+    // Return an empty list if ratings are requested.
+    // The test below checks that they should NOT be.
+    if (url === "/api/users/sambruin/ratings") {
+      return Response.json([]);
+    }
+
+    throw new Error("Unexpected request: " + url);
+  });
+
+  vi.stubGlobal("fetch", fakeFetch);
+
+  render(
+    <MemoryRouter initialEntries={["/users/sambruin"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  // Logged-out visitors should see the login page
+  expect(
+    await screen.findByRole("heading", {
+      name: "Log in"
+    })
+  ).toBeTruthy();
+
+  // Private ratings should never have been requested
+  expect(
+    fakeFetch.mock.calls.some(
+      ([url]) => url === "/api/users/sambruin/ratings"
+    )
+  ).toBe(false);
+});
