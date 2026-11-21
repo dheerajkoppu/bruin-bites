@@ -380,3 +380,116 @@ test("redirects logged-out users from a friend's profile", async () => {
     )
   ).toBe(false);
 });
+
+test("can follow again after unfollowing", async () => {
+  let isFollowing = false;
+
+  const fakeFetch = vi.fn(async (url, options) => {
+    if (url === "/api/auth/me") {
+      return Response.json({
+        user: {
+          _id: "user1",
+          username: "isaac",
+          email: "isaac@example.com"
+        }
+      });
+    }
+
+    if (url === "/api/ratings/me") {
+      return Response.json([]);
+    }
+
+    if (url === "/api/users/me/following") {
+      return Response.json({
+        following: isFollowing
+          ? [{ _id: "user2", username: "sambruin" }]
+          : []
+      });
+    }
+
+    if (url === "/api/users?search=sam") {
+      return Response.json([
+        { _id: "user2", username: "sambruin" }
+      ]);
+    }
+
+    if (url === "/api/users/sambruin/follow") {
+      if (options.method === "POST") {
+        isFollowing = true;
+        return Response.json({ message: "Followed" });
+      }
+
+      if (options.method === "DELETE") {
+        isFollowing = false;
+        return Response.json({ message: "Unfollowed" });
+      }
+    }
+
+    throw new Error("Unexpected request: " + url);
+  });
+
+  vi.stubGlobal("fetch", fakeFetch);
+
+  render(
+    <MemoryRouter initialEntries={["/profile"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  // Search for sambruin
+  await userEvent.type(
+    await screen.findByRole("searchbox", {
+      name: "Find friends"
+    }),
+    "sam"
+  );
+
+  await userEvent.click(
+    screen.getByRole("button", { name: "Search users" })
+  );
+
+  // Follow sambruin
+  await userEvent.click(
+    await screen.findByRole("button", {
+      name: "Follow sambruin"
+    })
+  );
+
+  // Wait until they appear in the Following list
+  const unfollowButton = await screen.findByRole("button", {
+    name: "Unfollow sambruin"
+  });
+
+  // Unfollow them
+  await userEvent.click(unfollowButton);
+
+  // Wait for the Following list to update
+  await waitFor(() => {
+    expect(
+      screen.queryByRole("button", {
+        name: "Unfollow sambruin"
+      })
+    ).toBeNull();
+  });
+
+  // The original Follow button should become available again
+  const followAgain = await screen.findByRole("button", {
+    name: "Follow sambruin"
+  });
+
+  expect(followAgain.disabled).toBe(false);
+
+  // Follow the same person again
+  await userEvent.click(followAgain);
+
+  // There should be two POST requests in total
+  await waitFor(() => {
+    const postRequests = fakeFetch.mock.calls.filter(
+      ([url, options]) =>
+        url === "/api/users/sambruin/follow" &&
+        options?.method === "POST"
+    );
+
+    expect(postRequests).toHaveLength(2);
+  });
+});
