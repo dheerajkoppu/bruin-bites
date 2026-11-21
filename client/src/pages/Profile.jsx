@@ -8,6 +8,7 @@ import { useState } from "react";
 function Profile() {
   const { user, isLoading, sessionError, restoreSession } = useAuth();
   const [followingVersion, setFollowingVersion] = useState(0);
+  const [followed, setFollowed] = useState([]);
 
   if (isLoading) return <p role="status">Checking your session…</p>;
   if (sessionError) {
@@ -30,12 +31,21 @@ function Profile() {
       <ProfileRatings key={user._id || user.email} />
 
       <FindFriends
-        onFollowed={() => {
+        followed={followed}
+        onFollowed={(username) => {
+          setFollowed((previous) => [...previous, username]);
           setFollowingVersion((previous) => previous + 1);
         }}
       />
 
-      <FollowingList refreshKey={followingVersion} />
+      <FollowingList
+        refreshKey={followingVersion}
+        onUnfollowed={(username) => {
+          setFollowed((previous) =>
+            previous.filter((name) => name !== username)
+          );
+        }}
+      />
     </div>
   );
 }

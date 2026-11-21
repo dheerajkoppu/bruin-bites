@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-function FollowingList({ refreshKey }) {
+function FollowingList({ refreshKey, onUnfollowed }) {
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -63,6 +63,7 @@ function FollowingList({ refreshKey }) {
       setFollowing((previous) =>
         previous.filter((person) => person.username !== username)
       );
+      onUnfollowed(username);
     } catch {
       setError("Could not unfollow user.");
     } finally {
