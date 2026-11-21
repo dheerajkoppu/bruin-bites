@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-function FollowingList() {
+function FollowingList({ refreshKey }) {
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -41,7 +41,7 @@ function FollowingList() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   async function unfollowUser(username) {
     setError("");

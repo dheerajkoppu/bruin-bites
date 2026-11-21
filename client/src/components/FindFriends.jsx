@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-function FindFriends() {
+function FindFriends({ onFollowed }) {
   const [searchText, setSearchText] = useState("");
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
@@ -57,6 +57,7 @@ function FindFriends() {
       }
 
       setFollowed((previous) => [...previous, username]);
+      onFollowed();
     } catch {
       setError("Could not follow user.");
     }
