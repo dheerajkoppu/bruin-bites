@@ -256,3 +256,87 @@ test("shows a friend's ranked dishes", async () => {
     })
   );
 });
+
+
+test("following someone updates the following list", async () => {
+  let isFollowing = false;
+
+  const fakeFetch = vi.fn(async (url, options) => {
+    if (url === "/api/auth/me") {
+      return Response.json({
+        user: {
+          _id: "user1",
+          username: "isaac",
+          email: "isaac@example.com"
+        }
+      });
+    }
+
+    if (url === "/api/ratings/me") {
+      return Response.json([]);
+    }
+
+    if (url === "/api/users/me/following") {
+      return Response.json({
+        following: isFollowing
+          ? [{ _id: "user2", username: "sambruin" }]
+          : []
+      });
+    }
+
+    if (url === "/api/users?search=sam") {
+      return Response.json([
+        { _id: "user2", username: "sambruin" }
+      ]);
+    }
+
+    if (
+      url === "/api/users/sambruin/follow" &&
+      options?.method === "POST"
+    ) {
+      isFollowing = true;
+      return Response.json({
+        message: "You are now following sambruin"
+      });
+    }
+
+    throw new Error("Unexpected request: " + url);
+  });
+
+  vi.stubGlobal("fetch", fakeFetch);
+
+  render(
+    <MemoryRouter initialEntries={["/profile"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  // Initially, the following list is empty
+  expect(
+    await screen.findByText("You aren't following anyone yet.")
+  ).toBeTruthy();
+
+  // Search for a user
+  await userEvent.type(
+    screen.getByRole("searchbox", { name: "Find friends" }),
+    "sam"
+  );
+
+  await userEvent.click(
+    screen.getByRole("button", { name: "Search users" })
+  );
+
+  // Follow that user
+  await userEvent.click(
+    await screen.findByRole("button", {
+      name: "Follow sambruin"
+    })
+  );
+
+  // The following list should update without a refresh
+  expect(
+    await screen.findByRole("button", {
+      name: "Unfollow sambruin"
+    })
+  ).toBeTruthy();
+});
