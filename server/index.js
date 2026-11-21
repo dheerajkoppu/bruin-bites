@@ -13,18 +13,13 @@ import { requireLogin } from "./middleware/requireLogin.js";
 import { group } from "node:console";
 import usersRouter from "./routes/users.js";
 import { rankedRatingsFor } from "./models/Rating.js";
-
+import {escapeRegExp} from "./utils/escapeRegExp.js";
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(createSession());
 app.use("/api/users", usersRouter);
-
-function escapeRegExp(string) {
-  // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 const TOP_DISHES_LIMIT = 10;
 const TOP_DISHES_MIN_RANKINGS = 3;

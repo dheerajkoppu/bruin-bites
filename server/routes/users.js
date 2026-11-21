@@ -3,7 +3,7 @@ import { HttpError } from "../middleware/errorHandler.js";
 import { requireLogin } from "../middleware/requireLogin.js";
 import User from "../models/User.js";
 import { rankedRatingsFor } from "../models/Rating.js";
-
+import {escapeRegExp} from "../utils/escapeRegExp.js";
 const router = Router();
 
 router.post("/:username/follow", requireLogin, async (req, res) => {
@@ -74,6 +74,21 @@ router.get("/:username/ratings", requireLogin, async (req, res) => {
 
     const ratings = await rankedRatingsFor(user._id);
     res.json(ratings);
+}
+);
+
+router.get("/", requireLogin, async (req, res) => {
+    const { search } = req.query;
+
+    if (typeof search !== "string" || search.trim() === "") {
+        return res.json([]);
+    }
+
+    const escaped = escapeRegExp(search);
+    const regex = new RegExp(escaped, "i");
+
+    const users = await User.find({ username: { $regex: regex }, _id: { $ne: req.session.userId } }).select("username").limit(10);
+    res.json(users);
 }
 );
 
