@@ -11,17 +11,15 @@ import { createSession } from "./session.js";
 import Rating, { scoreFor } from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
 import { group } from "node:console";
-
+import usersRouter from "./routes/users.js";
+import { rankedRatingsFor } from "./models/Rating.js";
+import {escapeRegExp} from "./utils/escapeRegExp.js";
 const app = express();
 // Render sits behind a proxy, and Express only sends the secure login cookie if it trusts it
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(createSession());
-
-function escapeRegExp(string) {
-  // Matches characters: . * + ? ^ $ { } ( ) [ ] | \
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+app.use("/api/users", usersRouter);
 
 const TOP_DISHES_LIMIT = 10;
 const TOP_DISHES_MIN_RANKINGS = 3;
@@ -118,19 +116,8 @@ app.get("/api/dishes", async (request, response) => {
 
 app.get("/api/ratings/me", requireLogin, async (request, response) => {
   try {
-    const ratings = await Rating.find({ user: request.session.userId })
-      .populate("dish")
-      .sort({ position: 1 })
-      .lean();
-    const groupSizes = { liked: 0, fine: 0, disliked: 0 };
-    for (const rating of ratings) {
-      groupSizes[rating.group]++;
-    }
-    const withScores = ratings.map((rating) => ({
-      ...rating,
-      score: scoreFor(rating.group, rating.position, groupSizes[rating.group]),
-    }));
-    response.json(withScores);
+    const ratings = await rankedRatingsFor(request.session.userId);
+    response.json(ratings);
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: "Internal Server Error" });
