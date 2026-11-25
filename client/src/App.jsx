@@ -8,6 +8,7 @@ import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import FriendProfile from "./pages/FriendProfile.jsx";
+import Dish from "./pages/Dish.jsx";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/users/:username" element={<FriendProfile />} />
+          <Route path="/dishes/:id" element={<Dish />} />
         </Routes>
       </main>
     </AuthProvider>
