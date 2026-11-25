@@ -10,7 +10,6 @@ import photosRouter from "./routes/photos.js";
 import { createSession } from "./session.js";
 import Rating, { scoreFor } from "./models/Rating.js";
 import { requireLogin } from "./middleware/requireLogin.js";
-import { group } from "node:console";
 import usersRouter from "./routes/users.js";
 import { rankedRatingsFor } from "./models/Rating.js";
 import {escapeRegExp} from "./utils/escapeRegExp.js";
@@ -153,6 +152,15 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
       dish: dishId,
     });
 
+    const othersInNewGroup = { user: request.session.userId, group };
+    if (existingRating) {
+      othersInNewGroup._id = { $ne: existingRating._id };
+    }
+
+    // Past the end of the group means last place, so scores stay inside the group's range
+    const othersInGroup = await Rating.countDocuments(othersInNewGroup);
+    const cappedPosition = Math.min(position, othersInGroup);
+
     // 1. Re-rating? Close the gap it leaves in its old group
     if (existingRating) {
       await Rating.updateMany(
@@ -164,7 +172,7 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
 
     // 2. Make room in the new group
     await Rating.updateMany(
-      { user: request.session.userId, group, position: { $gte: position } },
+      { ...othersInNewGroup, position: { $gte: cappedPosition } },
       { $inc: { position: 1 } },
       { timestamps: false }
     );
@@ -172,7 +180,7 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
     // 3a. Re-rating: move it to its new spot
     if (existingRating) {
       existingRating.group = group;
-      existingRating.position = position;
+      existingRating.position = cappedPosition;
       await existingRating.save();
       return response.json(existingRating);
     }
@@ -182,7 +190,7 @@ app.post("/api/ratings", requireLogin, async (request, response) => {
       user: request.session.userId,
       dish: dishId,
       group,
-      position,
+      position: cappedPosition,
     });
     await newRating.save();
     response.status(201).json(newRating);
