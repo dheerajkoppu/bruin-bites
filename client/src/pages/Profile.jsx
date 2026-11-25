@@ -1,9 +1,14 @@
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
+import FindFriends from "../components/FindFriends.jsx";
+import FollowingList from "../components/FollowingList.jsx";
+import { useState } from "react";
 
 function Profile() {
   const { user, isLoading, sessionError, restoreSession } = useAuth();
+  const [followingVersion, setFollowingVersion] = useState(0);
+  const [followed, setFollowed] = useState([]);
 
   if (isLoading) return <p role="status">Checking your session…</p>;
   if (sessionError) {
@@ -24,6 +29,23 @@ function Profile() {
         <p>{user.email}</p>
       </div>
       <ProfileRatings key={user._id || user.email} />
+
+      <FindFriends
+        followed={followed}
+        onFollowed={(username) => {
+          setFollowed((previous) => [...previous, username]);
+          setFollowingVersion((previous) => previous + 1);
+        }}
+      />
+
+      <FollowingList
+        refreshKey={followingVersion}
+        onUnfollowed={(username) => {
+          setFollowed((previous) =>
+            previous.filter((name) => name !== username)
+          );
+        }}
+      />
     </div>
   );
 }
