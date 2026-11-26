@@ -29,8 +29,8 @@ test("diet filters show the correct dishes", async () => {
     }
   ];
 
-  vi.stubGlobal("fetch", vi.fn(async () => {
-    return new Response(JSON.stringify(dishes), {
+  vi.stubGlobal("fetch", vi.fn(async (url) => {
+    return new Response(JSON.stringify(url.endsWith("/top") ? [] : dishes), {
       status: 200
     });
   }));

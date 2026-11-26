@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router";
+import TopDishes from "../components/TopDishes.jsx";
 
 function Hall() {
   const { hallName } = useParams();
@@ -41,6 +42,8 @@ function Hall() {
   return (
     <div>
       <h1>{hallName}</h1>
+
+      <TopDishes key={hallName} hallName={hallName} />
 
       <div className="filter-bar">
         <input
