@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "oxlint",
 
-    "test": "node --test src/api/*.test.js && vitest run --environment jsdom src/auth.test.jsx src/search.test.jsx src/hall.test.jsx src/dish.test.jsx src/compare.test.jsx src/profile.test.jsx src/friends.test.jsx src/topDishes.test.jsx",
+    "test": "node --test src/api/*.test.js && vitest run --environment jsdom src/auth.test.jsx src/search.test.jsx src/hall.test.jsx src/dish.test.jsx src/compare.test.jsx src/profile.test.jsx src/friends.test.jsx src/topDishes.test.jsx src/addDish.test.jsx",
 
     "preview": "vite preview"
   },
