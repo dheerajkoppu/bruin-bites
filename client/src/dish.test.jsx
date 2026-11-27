@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 // Set up fake API responses
-function setupTest(loggedIn = true, { photos = [], ratings = [], upload, saveRating } = {}) {
+function setupTest(loggedIn = true, { photos = [], ratings = [], savedDishes = [], upload, saveRating } = {}) {
   const fakeFetch = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") {
       if (loggedIn) {
@@ -36,6 +36,15 @@ function setupTest(loggedIn = true, { photos = [], ratings = [], upload, saveRat
       } else {
         return new Response(null, { status: 401 });
       }
+    }
+
+    if (url === "/api/users/me/want-to-try") {
+      if (options?.method === "POST") return new Response(null, { status: 201 });
+      return Response.json(savedDishes);
+    }
+
+    if (url === "/api/users/me/want-to-try/" + dish._id && options.method === "DELETE") {
+      return new Response(null, { status: 204 });
     }
 
     if (url === "/api/dishes/" + dish._id) {
@@ -263,4 +272,35 @@ test("waits for comparisons and disables controls while the photo uploads", asyn
   await screen.findByText("Rating and photo saved!");
   expect(input.disabled).toBe(false);
   expect(fakeFetch.mock.calls.filter(([url]) => url === "/api/ratings")).toHaveLength(1);
+});
+
+test("saves a dish to Want to Try and removes it again", async () => {
+  const fakeFetch = setupTest();
+
+  await userEvent.click(await screen.findByRole("button", { name: "Save to Want to Try" }));
+  expect(fakeFetch).toHaveBeenCalledWith("/api/users/me/want-to-try", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dishId: dish._id })
+  });
+
+  await userEvent.click(await screen.findByRole("button", { name: "Remove from Want to Try" }));
+  expect(fakeFetch).toHaveBeenCalledWith("/api/users/me/want-to-try/" + dish._id, {
+    method: "DELETE",
+    credentials: "include"
+  });
+  expect(await screen.findByRole("button", { name: "Save to Want to Try" })).toBeTruthy();
+});
+
+test("shows the remove button when visiting a saved dish", async () => {
+  setupTest(true, { savedDishes: [dish] });
+  expect(await screen.findByRole("button", { name: "Remove from Want to Try" })).toBeTruthy();
+});
+
+test("sends a logged-out visitor to login when saving a dish", async () => {
+  const fakeFetch = setupTest(false);
+  await userEvent.click(await screen.findByRole("button", { name: "Save to Want to Try" }));
+  expect(await screen.findByRole("heading", { name: "Log in" })).toBeTruthy();
+  expect(fakeFetch.mock.calls.some(([url]) => url.includes("want-to-try"))).toBe(false);
 });
