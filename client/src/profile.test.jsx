@@ -20,7 +20,7 @@ function mockApi({ session = () => Response.json({ user: account }), getRatings 
   const fetchMock = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") return session();
     if (url === "/api/ratings/me") return getRatings(options);
-    if (url === "/api/users/me/want-to-try") return Response.json(savedDishes);
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: savedDishes });
     if (url === "/api/users/me/want-to-try/d4" && options.method === "DELETE") {
       return new Response(null, { status: 204 });
     }

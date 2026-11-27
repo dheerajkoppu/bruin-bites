@@ -40,7 +40,7 @@ function setupTest(loggedIn = true, { photos = [], ratings = [], savedDishes = [
 
     if (url === "/api/users/me/want-to-try") {
       if (options?.method === "POST") return new Response(null, { status: 201 });
-      return Response.json(savedDishes);
+      return Response.json({ wantToTry: savedDishes });
     }
 
     if (url === "/api/users/me/want-to-try/" + dish._id && options.method === "DELETE") {

@@ -17,7 +17,7 @@ function WantToTry({ dish }) {
           credentials: "include"
         });
         if (!response.ok) throw new Error();
-        const dishes = await response.json();
+        const { wantToTry: dishes } = await response.json();
         if (!Array.isArray(dishes)) throw new Error();
         if (!ignore) setSavedDishes(dishes);
       } catch {
@@ -42,7 +42,7 @@ function WantToTry({ dish }) {
         body: JSON.stringify({ dishId: dish._id })
       });
       if (!response.ok) throw new Error();
-      setSavedDishes([...savedDishes, dish]);
+      setSavedDishes((previous) => [...previous, dish]);
     } catch {
       setError("Could not save this dish.");
     } finally {
@@ -59,7 +59,7 @@ function WantToTry({ dish }) {
         credentials: "include"
       });
       if (!response.ok) throw new Error();
-      setSavedDishes(savedDishes.filter((item) => item._id !== id));
+      setSavedDishes((previous) => previous.filter((item) => item._id !== id));
     } catch {
       setError("Could not remove this dish.");
     } finally {

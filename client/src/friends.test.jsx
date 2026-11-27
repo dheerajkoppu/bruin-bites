@@ -47,6 +47,7 @@ test("searches for a friend by username and follows them", async () => {
         });
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
@@ -148,6 +149,7 @@ test("shows followed users and lets you unfollow", async () => {
       });
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
@@ -221,6 +223,7 @@ test("shows a friend's ranked dishes", async () => {
       ]);
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
@@ -300,6 +303,7 @@ test("following someone updates the following list", async () => {
       });
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
@@ -355,6 +359,7 @@ test("redirects logged-out users from a friend's profile", async () => {
       return Response.json([]);
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
@@ -425,6 +430,7 @@ test("can follow again after unfollowing", async () => {
       }
     }
 
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
 
