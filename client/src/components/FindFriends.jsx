@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-function FindFriends({ followed, onFollowed }) {
+function FindFriends({ following, onFollowed }) {
   const [searchText, setSearchText] = useState("");
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
@@ -39,12 +39,12 @@ function FindFriends({ followed, onFollowed }) {
     }
   }
 
-  async function followUser(username) {
+  async function followUser(person) {
     setError("");
 
     try {
       const response = await fetch(
-        "/api/users/" + encodeURIComponent(username) + "/follow",
+        "/api/users/" + encodeURIComponent(person.username) + "/follow",
         {
           method: "POST",
           credentials: "include"
@@ -55,7 +55,7 @@ function FindFriends({ followed, onFollowed }) {
         throw new Error("Follow failed");
       }
 
-      onFollowed(username);
+      onFollowed(person);
     } catch {
       setError("Could not follow user.");
     }
@@ -87,10 +87,10 @@ function FindFriends({ followed, onFollowed }) {
 
           <button
             type="button"
-            disabled={followed.includes(user.username)}
-            onClick={() => followUser(user.username)}
+            disabled={following === null || following.some((friend) => friend._id === user._id)}
+            onClick={() => followUser(user)}
           >
-            {followed.includes(user.username)
+            {following === null ? "Checking follow status..." : following.some((friend) => friend._id === user._id)
               ? "Following " + user.username
               : "Follow " + user.username}
           </button>
