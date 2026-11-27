@@ -1,6 +1,7 @@
 import { Navigate, useParams } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
+import ProfileBadges from "../components/ProfileBadges.jsx";
 
 function FriendProfile() {
   const { username } = useParams();
@@ -32,6 +33,7 @@ function FriendProfile() {
   return (
     <div>
       <h1>{username}'s ratings</h1>
+      <ProfileBadges key={username} username={username} />
 
       <ProfileRatings
         key={username}

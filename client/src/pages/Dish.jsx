@@ -16,6 +16,7 @@ function DishDetails({ id }) {
   const [dish, setDish] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [earnedBadges, setEarnedBadges] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [photoError, setPhotoError] = useState("");
@@ -71,7 +72,8 @@ function DishDetails({ id }) {
     }
   }
 
-  async function finishRating() {
+  async function finishRating(badges = []) {
+    setEarnedBadges(badges);
     setMessage("Rating saved!");
     if (photo) await uploadPhoto();
     setSelectedGroup(null);
@@ -124,6 +126,7 @@ function DishDetails({ id }) {
     }
 
     setMessage("");
+    setEarnedBadges([]);
     setSelectedGroup(group);
   }
 
@@ -208,11 +211,15 @@ function DishDetails({ id }) {
         <CompareDishes
           dish={dish}
           group={selectedGroup}
+          username={user?.username}
           onDone={finishRating}
         />
       )}
 
       {message !== "" && <p role="status">{message}</p>}
+      {earnedBadges.length > 0 && (
+        <p role="status">You earned {earnedBadges.map((badge) => `"${badge.name}"`).join(" and ")}!</p>
+      )}
 
       <section aria-labelledby="dish-photos-heading">
         <h2 id="dish-photos-heading">Dish photos</h2>

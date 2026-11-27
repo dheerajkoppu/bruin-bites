@@ -47,6 +47,7 @@ test("searches for a friend by username and follows them", async () => {
         });
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -149,6 +150,7 @@ test("shows followed users and lets you unfollow", async () => {
       });
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -223,6 +225,7 @@ test("shows a friend's ranked dishes", async () => {
       ]);
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -303,6 +306,7 @@ test("following someone updates the following list", async () => {
       });
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -359,6 +363,7 @@ test("redirects logged-out users from a friend's profile", async () => {
       return Response.json([]);
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -430,6 +435,7 @@ test("can follow again after unfollowing", async () => {
       }
     }
 
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     throw new Error("Unexpected request: " + url);
   });
@@ -533,6 +539,7 @@ test("keeps Follow buttons in search when the following list fails to load", asy
       return Response.json({ user: { _id: "user1", username: "isaac", email: "isaac@example.com" } });
     }
     if (url === "/api/ratings/me") return Response.json([]);
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
     if (url === "/api/users/me/following") return new Response(null, { status: 500 });
     if (url === "/api/users?search=sam") return Response.json([{ _id: "user2", username: "sambruin" }]);

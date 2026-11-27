@@ -20,6 +20,7 @@ function setup({ session = () => Response.json({ user: account }), feed = () => 
   const fakeFetch = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") return session(options);
     if (url === "/api/feed") return feed(options);
+    if (/^\/api\/users\/[^/]+$/.test(url)) return Response.json({ badges: [] });
     if (url === "/api/users/me/following") return following(options);
     if (url === "/api/ratings/me") return Response.json([]);
     if (url === "/api/auth/logout") return new Response(null, { status: 204 });

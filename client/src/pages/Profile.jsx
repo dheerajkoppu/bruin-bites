@@ -1,6 +1,7 @@
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
+import ProfileBadges from "../components/ProfileBadges.jsx";
 import FindFriends from "../components/FindFriends.jsx";
 import FollowingList from "../components/FollowingList.jsx";
 import WantToTry from "../components/WantToTry.jsx";
@@ -47,6 +48,7 @@ function Profile() {
         <p>Welcome, {user.username}!</p>
         <p>{user.email}</p>
       </div>
+      <ProfileBadges key={user._id || user.email} username={user.username} ownProfile />
       <ProfileRatings key={user._id || user.email} />
 
       <WantToTry key={user._id || user.email} />
