@@ -240,3 +240,9 @@ The live site uses its own database, `bruin-bites-prod`, so local testing never 
 ## Photo credits
 
 The Bruin Plate photo is [Carnesale Commons](https://commons.wikimedia.org/wiki/File:UCLA_Carnesale_Commons.jpg) by Yhz1221 on Wikimedia Commons (CC BY-SA 4.0).
+
+### Badges frontend (US14, #63)
+
+The frontend integrates with the API planned in #60; that backend is not implemented in this branch. It expects authenticated `GET /api/users/:username` to return `{ username, badges: [{ name, earnedAt }] }`, where `earnedAt` is an ISO timestamp. Badge names are `First Bite` (rank your first dish) and `Hall Hopper` (rank a dish at every dining hall). The frontend supplies their descriptions; the backend owns all earning rules and persistence.
+
+Own and friend profiles fetch earned badges from this endpoint. After a successful ranking, the client compares badges fetched immediately before and after saving and announces newly earned names. If either badge check fails, the ranking still succeeds and no award is claimed. Photo uploads do not affect badge announcements. Until #60 is available, profiles show a badge loading error with a retry button. Badge tests mock this contract; live integration depends on #60.
