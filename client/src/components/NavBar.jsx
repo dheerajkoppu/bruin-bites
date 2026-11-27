@@ -47,6 +47,7 @@ function NavBar() {
         </form>
         {isLoading ? <span role="status">Checking session…</span> : user ? (
           <>
+            <Link to="/feed">Friends Feed</Link>
             <Link to="/profile">{user.username}</Link>
             <button className="nav-button" type="button" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? "Logging out…" : "Log out"}

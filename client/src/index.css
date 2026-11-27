@@ -424,6 +424,30 @@ select {
   white-space: nowrap;
 }
 
+.friends-feed {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.friends-feed li {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+
+.friends-feed p {
+  margin: 0 0 8px;
+}
+
+.friends-feed time {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .rating-photo {
   margin-bottom: 20px;
 }
