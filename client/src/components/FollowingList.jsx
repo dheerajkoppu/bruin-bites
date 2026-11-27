@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-function FollowingList({ refreshKey, onUnfollowed }) {
-  const [following, setFollowing] = useState([]);
+function FollowingList({ following, setFollowing }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [unfollowing, setUnfollowing] = useState("");
@@ -41,7 +40,7 @@ function FollowingList({ refreshKey, onUnfollowed }) {
     return () => {
       ignore = true;
     };
-  }, [refreshKey]);
+  }, [setFollowing]);
 
   async function unfollowUser(username) {
     setError("");
@@ -63,7 +62,6 @@ function FollowingList({ refreshKey, onUnfollowed }) {
       setFollowing((previous) =>
         previous.filter((person) => person.username !== username)
       );
-      onUnfollowed(username);
     } catch {
       setError("Could not unfollow user.");
     } finally {
@@ -79,11 +77,11 @@ function FollowingList({ refreshKey, onUnfollowed }) {
 
       {error !== "" && <p role="alert">{error}</p>}
 
-      {!loading && error === "" && following.length === 0 && (
+      {!loading && error === "" && following?.length === 0 && (
         <p>You aren't following anyone yet.</p>
       )}
 
-      {following.map((person) => (
+      {following?.map((person) => (
         <div key={person._id}>
           <Link to={"/users/" + encodeURIComponent(person.username)}>
             {person.username}

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-function FindFriends({ followed, onFollowed }) {
+function FindFriends({ following, onFollowed }) {
   const [searchText, setSearchText] = useState("");
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
@@ -39,12 +39,12 @@ function FindFriends({ followed, onFollowed }) {
     }
   }
 
-  async function followUser(username) {
+  async function followUser(person) {
     setError("");
 
     try {
       const response = await fetch(
-        "/api/users/" + encodeURIComponent(username) + "/follow",
+        "/api/users/" + encodeURIComponent(person.username) + "/follow",
         {
           method: "POST",
           credentials: "include"
@@ -55,7 +55,7 @@ function FindFriends({ followed, onFollowed }) {
         throw new Error("Follow failed");
       }
 
-      onFollowed(username);
+      onFollowed(person);
     } catch {
       setError("Could not follow user.");
     }
@@ -81,21 +81,24 @@ function FindFriends({ followed, onFollowed }) {
 
       {error !== "" && <p role="alert">{error}</p>}
 
-      {users.map((user) => (
-        <div key={user._id}>
-          <span>{user.username}</span>
+      {users.map((user) => {
+        const isFollowing = following?.some((friend) => friend._id === user._id);
+        return (
+          <div key={user._id}>
+            <span>{user.username}</span>
 
-          <button
-            type="button"
-            disabled={followed.includes(user.username)}
-            onClick={() => followUser(user.username)}
-          >
-            {followed.includes(user.username)
-              ? "Following " + user.username
-              : "Follow " + user.username}
-          </button>
-        </div>
-      ))}
+            {following !== null && (
+              <button
+                type="button"
+                disabled={isFollowing}
+                onClick={() => followUser(user)}
+              >
+                {isFollowing ? "Following " : "Follow "}{user.username}
+              </button>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }
