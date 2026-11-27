@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
+const listUrl = "/api/users/me/want-to-try";
+
 function WantToTry({ dish }) {
   const [savedDishes, setSavedDishes] = useState(null);
   const [error, setError] = useState("");
@@ -11,7 +13,7 @@ function WantToTry({ dish }) {
 
     async function loadDishes() {
       try {
-        const response = await fetch("/api/users/me/want-to-try", {
+        const response = await fetch(listUrl, {
           credentials: "include"
         });
         if (!response.ok) throw new Error();
@@ -33,7 +35,7 @@ function WantToTry({ dish }) {
     setSaving(true);
     setError("");
     try {
-      const response = await fetch("/api/users/me/want-to-try", {
+      const response = await fetch(listUrl, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -52,7 +54,7 @@ function WantToTry({ dish }) {
     setSaving(true);
     setError("");
     try {
-      const response = await fetch("/api/users/me/want-to-try/" + id, {
+      const response = await fetch(listUrl + "/" + id, {
         method: "DELETE",
         credentials: "include"
       });
@@ -65,40 +67,48 @@ function WantToTry({ dish }) {
     }
   }
 
-  if (dish) {
+  function showDishes() {
     if (savedDishes === null) {
-      if (error) return <p role="alert">{error}</p>;
+      if (error) return null;
       return <p>Loading Want to Try...</p>;
     }
-    const saved = savedDishes.some((item) => item._id === dish._id);
-    return (
-      <div>
-        <button type="button" disabled={saving} onClick={saved ? () => removeDish(dish._id) : saveDish}>
+
+    if (dish) {
+      const saved = savedDishes.some((item) => item._id === dish._id);
+      return (
+        <button
+          type="button"
+          disabled={saving}
+          onClick={saved ? () => removeDish(dish._id) : saveDish}
+        >
           {saved ? "Remove from Want to Try" : "Save to Want to Try"}
         </button>
-        {error && <p role="alert">{error}</p>}
-      </div>
+      );
+    }
+
+    if (savedDishes.length === 0) {
+      return <p>You haven't saved any dishes yet.</p>;
+    }
+
+    return (
+      <ul>
+        {savedDishes.map((item) => (
+          <li key={item._id}>
+            <Link to={"/dishes/" + item._id}>{item.name}</Link> ({item.hall}){" "}
+            <button type="button" disabled={saving} onClick={() => removeDish(item._id)}>
+              Remove {item.name}
+            </button>
+          </li>
+        ))}
+      </ul>
     );
   }
 
   return (
     <section>
-      <h2>Want to Try</h2>
+      {!dish && <h2>Want to Try</h2>}
+      {showDishes()}
       {error && <p role="alert">{error}</p>}
-      {savedDishes === null && !error && <p>Loading Want to Try...</p>}
-      {savedDishes?.length === 0 && <p>You haven't saved any dishes yet.</p>}
-      {savedDishes && savedDishes.length > 0 && (
-        <ul>
-          {savedDishes.map((item) => (
-            <li key={item._id}>
-              <Link to={"/dishes/" + item._id}>{item.name}</Link> ({item.hall}){" "}
-              <button type="button" disabled={saving} onClick={() => removeDish(item._id)}>
-                Remove {item.name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
     </section>
   );
 }
