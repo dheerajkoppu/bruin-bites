@@ -39,8 +39,7 @@ function Profile() {
         }}
       />
 
-      <FollowingList following={following} setFollowing={setFollowing}
-      />
+      <FollowingList following={following} setFollowing={setFollowing} />
     </div>
   );
 }

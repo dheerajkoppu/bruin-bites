@@ -81,21 +81,24 @@ function FindFriends({ following, onFollowed }) {
 
       {error !== "" && <p role="alert">{error}</p>}
 
-      {users.map((user) => (
-        <div key={user._id}>
-          <span>{user.username}</span>
+      {users.map((user) => {
+        const isFollowing = following?.some((friend) => friend._id === user._id);
+        return (
+          <div key={user._id}>
+            <span>{user.username}</span>
 
-          <button
-            type="button"
-            disabled={following === null || following.some((friend) => friend._id === user._id)}
-            onClick={() => followUser(user)}
-          >
-            {following === null ? "Checking follow status..." : following.some((friend) => friend._id === user._id)
-              ? "Following " + user.username
-              : "Follow " + user.username}
-          </button>
-        </div>
-      ))}
+            {following !== null && (
+              <button
+                type="button"
+                disabled={isFollowing}
+                onClick={() => followUser(user)}
+              >
+                {isFollowing ? "Following " : "Follow "}{user.username}
+              </button>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }
