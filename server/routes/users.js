@@ -112,6 +112,13 @@ router.delete("/me/want-to-try/:dishId", requireLogin, async (request, response)
   response.status(200).json({ message: `Dish ${dish.name} removed from want-to-try list.` });
 });
 
+router.get("/me/want-to-try", requireLogin, async (request, response) => {
+  const user = await User.findById(request.session.userId).populate("wantToTry", "name hall");
+  if(!user) {
+    throw new HttpError(404, "User not found.");
+  }
+  response.status(200).json({ wantToTry: user.wantToTry });
+});
 
 
 export default router;
