@@ -526,3 +526,29 @@ test("search shows Following for a friend followed before opening the profile", 
   const button = await screen.findByRole("button", { name: "Following sambruin" });
   expect(button.disabled).toBe(true);
 });
+
+test("keeps Follow buttons in search when the following list fails to load", async () => {
+  const fakeFetch = vi.fn(async (url) => {
+    if (url === "/api/auth/me") {
+      return Response.json({ user: { _id: "user1", username: "isaac", email: "isaac@example.com" } });
+    }
+    if (url === "/api/ratings/me") return Response.json([]);
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: [] });
+    if (url === "/api/users/me/following") return new Response(null, { status: 500 });
+    if (url === "/api/users?search=sam") return Response.json([{ _id: "user2", username: "sambruin" }]);
+    throw new Error("Unexpected request: " + url);
+  });
+  vi.stubGlobal("fetch", fakeFetch);
+
+  render(
+    <MemoryRouter initialEntries={["/profile"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByText("Could not load followed users.")).toBeTruthy();
+  await userEvent.type(await screen.findByRole("searchbox", { name: "Find friends" }), "sam");
+  await userEvent.click(screen.getByRole("button", { name: "Search users" }));
+
+  expect(await screen.findByRole("button", { name: "Follow sambruin" })).toBeTruthy();
+});

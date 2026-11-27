@@ -18,8 +18,14 @@ router.get("/", async (request, response) => {
 });
 
 router.post("/", requireLogin, async (request, response) => {
-  const { name, hall } = request.body;
-  const dish = new Dish({ name, hall: HALLS.find((known) => known.toLowerCase() === String(hall).toLowerCase()) });
+  const { name, hall, vegetarian, vegan, glutenFree } = request.body ?? {};
+  const dish = new Dish({
+    name: typeof name === "string" ? name.replace(/\s+/g, " ") : name,
+    hall: HALLS.find((known) => known.toLowerCase() === String(hall).trim().toLowerCase()),
+    vegetarian: vegetarian === true,
+    vegan: vegan === true,
+    glutenFree: glutenFree === true,
+  });
   await dish.validate();
 
   const existing = await Dish.findOne({ hall: dish.hall, name: new RegExp(`^${escapeRegExp(dish.name)}$`, "i") });
@@ -27,7 +33,14 @@ router.post("/", requireLogin, async (request, response) => {
     throw new HttpError(409, `${existing.name} is already on the ${existing.hall} menu.`);
   }
 
-  await dish.save();
+  try {
+    await dish.save();
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new HttpError(409, `${dish.name} is already on the ${dish.hall} menu.`);
+    }
+    throw error;
+  }
   response.status(201).json(dish);
 });
 

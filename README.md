@@ -186,7 +186,7 @@ Requests and responses are JSON unless noted. Errors look like `{ "error": "mess
 | `GET /api/halls/:hallName/top` | up to 10 dishes with `averageScore` and `rankingCount` from the last 7 days |
 | `GET /api/dishes?search=text` | dishes whose name contains the text |
 | `GET /api/dishes/:id` | the dish plus `photos`, newest first. 404 if missing |
-| `POST /api/dishes` 🔒 `{ name, hall }` | 201 the new dish. 400 for an empty name or unknown hall, 409 if that hall already has the dish (ignoring case) |
+| `POST /api/dishes` 🔒 `{ name, hall, vegetarian?, vegan?, glutenFree? }` | 201 the new dish. 400 for an empty or over-100-character name or unknown hall, 409 if that hall already has the dish (ignoring case) |
 | `GET /api/ratings/me` 🔒 | your ratings, each with its populated `dish` and `score` |
 | `POST /api/ratings` 🔒 `{ dishId, group, position }` | 201 for a new rating, 200 for a re-rating |
 | `POST /api/dishes/:id/photos` 🔒 | multipart with one JPG or PNG under 5 MB in the `photo` field. 201 `{ photo }` |

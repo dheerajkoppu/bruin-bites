@@ -1,9 +1,8 @@
-import WantToTry from "../components/WantToTry.jsx";
-
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import CompareDishes from "../components/CompareDishes.jsx";
+import WantToTry from "../components/WantToTry.jsx";
 
 function Dish() {
   const { id } = useParams();

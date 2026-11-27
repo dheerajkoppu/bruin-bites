@@ -1,14 +1,33 @@
-import WantToTry from "../components/WantToTry.jsx";
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
 import FindFriends from "../components/FindFriends.jsx";
 import FollowingList from "../components/FollowingList.jsx";
+import WantToTry from "../components/WantToTry.jsx";
 import { useState } from "react";
+
+function Friends() {
+  const [following, setFollowing] = useState(null);
+
+  return (
+    <>
+      <FindFriends
+        following={following}
+        onFollowed={(person) => {
+          setFollowing((previous) => {
+            if (previous.some((friend) => friend._id === person._id)) return previous;
+            return [...previous, person];
+          });
+        }}
+      />
+
+      <FollowingList following={following} setFollowing={setFollowing} />
+    </>
+  );
+}
 
 function Profile() {
   const { user, isLoading, sessionError, restoreSession } = useAuth();
-  const [following, setFollowing] = useState(null);
 
   if (isLoading) return <p role="status">Checking your session…</p>;
   if (sessionError) {
@@ -32,17 +51,8 @@ function Profile() {
 
       <WantToTry key={user._id || user.email} />
 
-      <FindFriends
-        following={following}
-        onFollowed={(person) => {
-          setFollowing((previous) => {
-            if (previous.some((friend) => friend._id === person._id)) return previous;
-            return [...previous, person];
-          });
-        }}
-      />
-
-      <FollowingList following={following} setFollowing={setFollowing} />
+      {/* Keyed so a different signed-in user gets a fresh following list. */}
+      <Friends key={user._id || user.email} />
     </div>
   );
 }
