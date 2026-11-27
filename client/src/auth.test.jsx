@@ -15,6 +15,7 @@ function mockApi({ session = () => new Response(null, { status: 401 }), login, l
   const fetchMock = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") return session(options);
     if (url === "/api/ratings/me") return Response.json([]);
+    if (url === "/api/users/me/want-to-try") return Response.json([]);
     if (url === "/api/users/me/following") return Response.json({ following: [] });
     if (url === "/api/auth/login" && login) return login(options);
     if (url === "/api/auth/logout" && logout) return logout(options);

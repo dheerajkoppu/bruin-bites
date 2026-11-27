@@ -1,3 +1,4 @@
+import WantToTry from "../components/WantToTry.jsx";
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -147,7 +148,14 @@ function DishDetails({ id }) {
       {dish.vegan && <p>Vegan</p>}
       {dish.glutenFree && <p>Gluten Free</p>}
 
-      
+      {user ? (
+        <WantToTry key={user._id || user.email} dish={dish} />
+      ) : (
+        <button type="button" disabled={isLoading} onClick={() => navigate("/login")}>
+          Save to Want to Try
+        </button>
+      )}
+
       <h2>Rate this dish</h2>
 
       {user && (
