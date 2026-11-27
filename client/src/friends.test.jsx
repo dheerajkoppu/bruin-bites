@@ -493,3 +493,30 @@ test("can follow again after unfollowing", async () => {
     expect(postRequests).toHaveLength(2);
   });
 });
+
+test("search shows Following for a friend followed before opening the profile", async () => {
+  const friend = { _id: "user2", username: "sambruin" };
+  const fakeFetch = vi.fn(async (url) => {
+    if (url === "/api/auth/me") {
+      return Response.json({ user: { _id: "user1", username: "isaac", email: "isaac@example.com" } });
+    }
+    if (url === "/api/ratings/me") return Response.json([]);
+    if (url === "/api/users/me/following") return Response.json({ following: [friend] });
+    if (url === "/api/users?search=sam") return Response.json([friend]);
+    throw new Error("Unexpected request: " + url);
+  });
+  vi.stubGlobal("fetch", fakeFetch);
+
+  render(
+    <MemoryRouter initialEntries={["/profile"]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  await screen.findByRole("button", { name: "Unfollow sambruin" });
+  await userEvent.type(screen.getByRole("searchbox", { name: "Find friends" }), "sam");
+  await userEvent.click(screen.getByRole("button", { name: "Search users" }));
+
+  const button = await screen.findByRole("button", { name: "Following sambruin" });
+  expect(button.disabled).toBe(true);
+});
