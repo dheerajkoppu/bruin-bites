@@ -4,6 +4,8 @@ import { requireLogin } from "../middleware/requireLogin.js";
 import User from "../models/User.js";
 import { rankedRatingsFor } from "../models/Rating.js";
 import { escapeRegExp } from "../utils/escapeRegExp.js";
+import mongoose from "mongoose";
+import Dish from "../models/Dish.js";
 
 const router = Router();
 
@@ -86,6 +88,41 @@ router.get("/", requireLogin, async (request, response) => {
 
   const users = await User.find({ username: { $regex: regex }, _id: { $ne: request.session.userId } }).select("username").limit(10);
   response.json(users);
+});
+
+router.post("/me/want-to-try", requireLogin, async (request, response) => {
+  const { dishId } = request.body ?? {};
+  if (!mongoose.isValidObjectId(dishId)) {
+    throw new HttpError(400, "A valid dish id is required.");
+  }
+
+  const dish = await Dish.findById(dishId);
+  if (!dish) {
+    throw new HttpError(404, "Dish not found.");
+  }
+
+  await User.findByIdAndUpdate(request.session.userId, { $addToSet: { wantToTry: dish._id } });
+  response.status(200).json({ message: `Dish ${dish.name} added to want-to-try list.` });
+});
+
+router.delete("/me/want-to-try/:dishId", requireLogin, async (request, response) => {
+  const { dishId } = request.params;
+  if (!mongoose.isValidObjectId(dishId)) {
+    throw new HttpError(400, "A valid dish id is required.");
+  }
+
+  // Pull without looking up the dish so ids left behind by a reseed can still be removed.
+  await User.findByIdAndUpdate(request.session.userId, { $pull: { wantToTry: dishId } });
+  response.status(200).json({ message: "Dish removed from want-to-try list." });
+});
+
+router.get("/me/want-to-try", requireLogin, async (request, response) => {
+  const user = await User.findById(request.session.userId).populate("wantToTry", "name hall");
+  if (!user) {
+    throw new HttpError(404, "User not found.");
+  }
+
+  response.status(200).json({ wantToTry: user.wantToTry });
 });
 
 export default router;

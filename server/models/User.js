@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema(
       ref: "User",
       default: [],
     },
+    wantToTry: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Dish",
+      default: [],
+    },
   },
   {
     timestamps: true,
