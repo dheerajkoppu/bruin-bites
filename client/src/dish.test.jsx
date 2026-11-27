@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 // Set up fake API responses
-function setupTest(loggedIn = true) {
+function setupTest(loggedIn = true, { photos = [], ratings = [], upload, saveRating } = {}) {
   const fakeFetch = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") {
       if (loggedIn) {
@@ -39,17 +39,21 @@ function setupTest(loggedIn = true) {
     }
 
     if (url === "/api/dishes/" + dish._id) {
-      return Response.json(dish);
+      return Response.json({ ...dish, photos });
     }
 
     if (url === "/api/ratings/me") {  
-      return Response.json([]);
+      return Response.json(ratings);
     }
 
     if (url === "/api/ratings") {
       if (options.method === "POST") {
-        return Response.json({ success: true });
+        return saveRating ? saveRating() : Response.json({ success: true });
       }
+    }
+
+    if (url === `/api/dishes/${dish._id}/photos` && upload) {
+      return upload(options);
     }
 
     throw new Error("Unexpected API request: " + url);
@@ -155,4 +159,108 @@ test("redirects logged out users to login", async () => {
   });
 
   expect(loginHeading).toBeTruthy();
+});
+
+const savedPhoto = { _id: "photo1", url: "/api/photos/photo1" };
+
+test("shows existing dish photos to logged-out visitors", async () => {
+  setupTest(false, { photos: [savedPhoto] });
+  const image = await screen.findByRole("img", { name: "Pesto Pasta photo 1" });
+  expect(image.getAttribute("src")).toBe(savedPhoto.url);
+  expect(screen.queryByLabelText("Add a photo (optional)")).toBeNull();
+});
+
+for (const type of ["image/jpeg", "image/png"]) {
+  test(`uploads an optional ${type} after saving the rating and displays it`, async () => {
+    const fakeFetch = setupTest(true, {
+      upload: () => Response.json({ photo: savedPhoto }, { status: 201 }),
+    });
+    const input = await screen.findByLabelText("Add a photo (optional)");
+    const file = new File(["photo"], type === "image/png" ? "meal.png" : "meal.jpg", { type });
+    await userEvent.upload(input, file);
+    await userEvent.click(screen.getByRole("button", { name: "Liked it" }));
+    await screen.findByText("Rating and photo saved!");
+    const uploadCall = fakeFetch.mock.calls.find(([url]) => url.endsWith("/photos"));
+    expect(uploadCall[1].body.get("photo")).toBe(file);
+    expect(uploadCall[1].credentials).toBe("include");
+    expect(fakeFetch.mock.calls.findIndex(([url]) => url === "/api/ratings"))
+      .toBeLessThan(fakeFetch.mock.calls.indexOf(uploadCall));
+    expect(await screen.findByRole("img", { name: "Pesto Pasta photo 1" })).toBeTruthy();
+    expect(input.files.length).toBe(0);
+  });
+}
+
+for (const [name, type, size, message] of [
+  ["meal.gif", "image/gif", 10, "Photo must be a JPG or PNG."],
+  ["meal.png", "image/png", 5 * 1024 * 1024, "Photo must be under 5 MB."],
+  ["meal.jpg", "image/jpeg", 5 * 1024 * 1024 + 1, "Photo must be under 5 MB."],
+]) {
+  test(`rejects ${name} with ${size} bytes before submitting`, async () => {
+    const fakeFetch = setupTest();
+    const input = await screen.findByLabelText("Add a photo (optional)");
+    await userEvent.setup({ applyAccept: false }).upload(input, new File([new Uint8Array(size)], name, { type }));
+    expect((await screen.findByRole("alert")).textContent).toBe(message);
+    expect(screen.getByRole("button", { name: "Liked it" }).disabled).toBe(true);
+    expect(fakeFetch.mock.calls.some(([url]) => url === "/api/ratings" || url.endsWith("/photos"))).toBe(false);
+    await userEvent.click(screen.getByRole("button", { name: "Remove photo" }));
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("button", { name: "Liked it" }).disabled).toBe(false);
+  });
+}
+
+test("accepts a photo just under 5 MB", async () => {
+  setupTest();
+  const input = await screen.findByLabelText("Add a photo (optional)");
+  await userEvent.upload(input, new File([new Uint8Array(5 * 1024 * 1024 - 1)], "meal.png", { type: "image/png" }));
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.getByRole("button", { name: "Liked it" }).disabled).toBe(false);
+});
+
+test("retries a failed photo upload without saving the rating again", async () => {
+  const upload = vi.fn()
+    .mockResolvedValueOnce(Response.json({ error: "Photo must be a JPG or PNG." }, { status: 400 }))
+    .mockResolvedValueOnce(Response.json({ photo: savedPhoto }, { status: 201 }));
+  const fakeFetch = setupTest(true, { upload });
+  await userEvent.upload(await screen.findByLabelText("Add a photo (optional)"),
+    new File(["photo"], "meal.png", { type: "image/png" }));
+  await userEvent.click(screen.getByRole("button", { name: "Liked it" }));
+  expect((await screen.findByRole("alert")).textContent).toContain("Your rating was saved, but the photo was not uploaded.");
+  await userEvent.click(screen.getByRole("button", { name: "Retry photo upload" }));
+  await screen.findByText("Rating and photo saved!");
+  expect(upload).toHaveBeenCalledTimes(2);
+  expect(fakeFetch.mock.calls.filter(([url]) => url === "/api/ratings")).toHaveLength(1);
+});
+
+test("does not upload a photo if saving the rating fails", async () => {
+  const upload = vi.fn();
+  setupTest(true, { upload, saveRating: () => new Response(null, { status: 500 }) });
+  await userEvent.upload(await screen.findByLabelText("Add a photo (optional)"),
+    new File(["photo"], "meal.png", { type: "image/png" }));
+  await userEvent.click(screen.getByRole("button", { name: "Liked it" }));
+  expect((await screen.findByRole("alert")).textContent).toBe("Could not save your rating.");
+  expect(upload).not.toHaveBeenCalled();
+});
+
+test("waits for comparisons and disables controls while the photo uploads", async () => {
+  let finishUpload;
+  const upload = vi.fn(() => new Promise((resolve) => { finishUpload = resolve; }));
+  const fakeFetch = setupTest(true, {
+    ratings: [{ group: "liked", position: 0, dish: { _id: "other", name: "Other dish" } }],
+    upload,
+  });
+  const input = await screen.findByLabelText("Add a photo (optional)");
+  await userEvent.upload(input, new File(["photo"], "meal.png", { type: "image/png" }));
+  await userEvent.click(screen.getByRole("button", { name: "Liked it" }));
+  await screen.findByRole("heading", { name: "Which was better?" });
+  expect(upload).not.toHaveBeenCalled();
+  expect(input.disabled).toBe(true);
+  await userEvent.click(screen.getByRole("button", { name: "Pesto Pasta" }));
+  await screen.findByText("Uploading photo…");
+  expect(input.disabled).toBe(true);
+  expect(screen.getByRole("button", { name: "Liked it" }).disabled).toBe(true);
+  expect(screen.queryByRole("img", { name: "Pesto Pasta photo 1" })).toBeNull();
+  finishUpload(Response.json({ photo: savedPhoto }, { status: 201 }));
+  await screen.findByText("Rating and photo saved!");
+  expect(input.disabled).toBe(false);
+  expect(fakeFetch.mock.calls.filter(([url]) => url === "/api/ratings")).toHaveLength(1);
 });
