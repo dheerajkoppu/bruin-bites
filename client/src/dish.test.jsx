@@ -304,3 +304,15 @@ test("sends a logged-out visitor to login when saving a dish", async () => {
   expect(await screen.findByRole("heading", { name: "Log in" })).toBeTruthy();
   expect(fakeFetch.mock.calls.some(([url]) => url.includes("want-to-try"))).toBe(false);
 });
+
+test("sends the user to login when their session expires before saving", async () => {
+  const fakeFetch = setupTest();
+  const original = fakeFetch.getMockImplementation();
+  fakeFetch.mockImplementation(async (url, options) => {
+    if (url === "/api/users/me/want-to-try" && options?.method === "POST") return new Response(null, { status: 401 });
+    return original(url, options);
+  });
+
+  await userEvent.click(await screen.findByRole("button", { name: "Save to Want to Try" }));
+  expect(await screen.findByRole("heading", { name: "Log in" })).toBeTruthy();
+});

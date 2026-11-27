@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../context/useAuth.js";
 
 const listUrl = "/api/users/me/want-to-try";
 
 function WantToTry({ dish }) {
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
   const [savedDishes, setSavedDishes] = useState(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -37,6 +40,11 @@ function WantToTry({ dish }) {
     setAttempt((previous) => previous + 1);
   }
 
+  function sendToLogin() {
+    setUser(null);
+    navigate("/login");
+  }
+
   async function saveDish() {
     setSaving(true);
     setError("");
@@ -47,6 +55,7 @@ function WantToTry({ dish }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dishId: dish._id })
       });
+      if (response.status === 401) return sendToLogin();
       if (!response.ok) throw new Error();
       setSavedDishes((previous) => [...previous, dish]);
     } catch {
@@ -64,6 +73,7 @@ function WantToTry({ dish }) {
         method: "DELETE",
         credentials: "include"
       });
+      if (response.status === 401) return sendToLogin();
       if (!response.ok) throw new Error();
       setSavedDishes((previous) => previous.filter((item) => item._id !== id));
     } catch {
