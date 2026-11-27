@@ -209,8 +209,8 @@ client/
     App.jsx       routes
     *.test.jsx    Vitest component tests
 server/
-  index.js        Express app, plus the hall, dish, and rating routes
-  routes/         auth, users (follow), feed, and photos routers
+  index.js        Express app: sessions, routers, and serving the built client
+  routes/         one router per feature: auth, halls, dishes, ratings, users, feed, photos
   models/         Mongoose models: User, Dish, Rating, Photo
   middleware/     requireLogin and the error handler
   session.js      session cookie setup
