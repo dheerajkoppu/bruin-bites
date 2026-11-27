@@ -1,21 +1,26 @@
 import { useState, useEffect } from "react";
+import { getBadges } from "../api/badges.js";
 
 // After you pick a group, asks "which was better?" to binary search where the dish goes.
-function CompareDishes({ dish, group, onDone }) {
+function CompareDishes({ dish, group, onDone, username }) {
   const [rankedDishes, setRankedDishes] = useState(null);
   const [low, setLow] = useState(0);
   const [high, setHigh] = useState(0);
   const [error, setError] = useState("");
 
-  function saveRating(position) {
+  async function saveRating(position) {
+    // A missing badge API must not prevent the rating from being saved.
+    const before = username ? await getBadges(username).catch(() => null) : null;
     fetch("/api/ratings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ dishId: dish._id, group, position }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) throw new Error("Could not save your rating.");
-        onDone();
+        const after = before ? await getBadges(username).catch(() => null) : null;
+        const earned = after?.filter((badge) => !before.some((old) => old.name === badge.name)) || [];
+        onDone(earned);
       })
       .catch((error) => setError(error.message));
   }
