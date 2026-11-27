@@ -16,10 +16,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mockApi({ session = () => Response.json({ user: account }), getRatings = () => Response.json(ratings), login = account } = {}) {
+function mockApi({ session = () => Response.json({ user: account }), getRatings = () => Response.json(ratings), login = account, savedDishes = [] } = {}) {
   const fetchMock = vi.fn(async (url, options) => {
     if (url === "/api/auth/me") return session();
     if (url === "/api/ratings/me") return getRatings(options);
+    if (url === "/api/users/me/want-to-try") return Response.json({ wantToTry: savedDishes });
+    if (url === "/api/users/me/want-to-try/d4" && options.method === "DELETE") {
+      return new Response(null, { status: 204 });
+    }
     if (url === "/api/users/me/following") return Response.json({ following: [] });
     if (url === "/api/auth/logout") return new Response(null, { status: 204 });
     if (url === "/api/auth/login") return Response.json({ user: login });
@@ -175,4 +179,19 @@ test("a late ratings response after logout cannot overwrite another account's ra
   await act(async () => resolveFirstRatings(Response.json(ratings)));
   expect(screen.queryByText("Pasta")).toBeNull();
   expect(screen.getByText("other@ucla.edu")).toBeTruthy();
+});
+
+test("links to a Want to Try dish and shows the empty list after removal", async () => {
+  const fetchMock = mockApi({ savedDishes: [{ _id: "d4", name: "Curry", hall: "De Neve" }] });
+  openProfile();
+
+  const link = await screen.findByRole("link", { name: "Curry" });
+  expect(link.getAttribute("href")).toBe("/dishes/d4");
+  await userEvent.click(screen.getByRole("button", { name: "Remove Curry" }));
+  expect(fetchMock).toHaveBeenCalledWith("/api/users/me/want-to-try/d4", {
+    method: "DELETE",
+    credentials: "include"
+  });
+  expect(await screen.findByText("You haven't saved any dishes yet.")).toBeTruthy();
+  expect(screen.queryByRole("link", { name: "Curry" })).toBeNull();
 });

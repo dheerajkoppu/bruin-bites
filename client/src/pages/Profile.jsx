@@ -1,3 +1,4 @@
+import WantToTry from "../components/WantToTry.jsx";
 import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth.js";
 import ProfileRatings from "../components/ProfileRatings.jsx";
@@ -28,6 +29,8 @@ function Profile() {
         <p>{user.email}</p>
       </div>
       <ProfileRatings key={user._id || user.email} />
+
+      <WantToTry key={user._id || user.email} />
 
       <FindFriends
         following={following}
