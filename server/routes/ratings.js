@@ -14,7 +14,7 @@ router.get("/me", requireLogin, async (request, response) => {
 
 // Saves a rating at a position in its group, shifting the user's other ratings to keep positions gap-free.
 router.post("/", requireLogin, async (request, response) => {
-  const { dishId, group, position } = request.body;
+  const { dishId, group, position } = request.body ?? {};
   const userId = request.session.userId;
 
   if (!mongoose.Types.ObjectId.isValid(dishId)) {
