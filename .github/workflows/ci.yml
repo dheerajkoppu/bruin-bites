@@ -36,9 +36,9 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
       - run: npm ci
-      # The server has no tests yet, so at least catch syntax errors and leftover merge conflicts
       - name: Check syntax
         run: for file in $(git ls-files '*.js'); do node --check "$file"; done
+      - run: npm test
 
   e2e:
     runs-on: ubuntu-latest
