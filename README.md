@@ -68,6 +68,109 @@ Open http://localhost:5173. The Vite dev server sends every request starting wit
 
 The end-to-end tests build the client, start the real Express server against a throwaway in-memory MongoDB, seed it, and drive Chromium through signing up, rating and ranking dishes, searching, and following a friend. CI runs all of these on every pull request.
 
+## Architecture
+
+### System overview
+
+In production, one Express server on Render serves both the built React app and the API, so they share a domain and the login cookie just works. Locally, the Vite dev server serves the React app and proxies `/api` to Express.
+
+```mermaid
+flowchart LR
+    subgraph Browser
+        UI["React app<br/>pages + components"]
+        Auth["AuthContext<br/>current user"]
+        UI --- Auth
+    end
+
+    subgraph Server["Express server (Render)"]
+        Session["express-session<br/>+ requireLogin"]
+        Routes["Routes<br/>/api/auth · /api/halls · /api/dishes<br/>/api/ratings · /api/users · /api/feed · /api/photos"]
+        Static["Static files<br/>client/dist"]
+        Session --> Routes
+    end
+
+    subgraph Atlas["MongoDB Atlas"]
+        Collections[("users · dishes · ratings<br/>photos · sessions")]
+    end
+
+    UI -- "fetch /api/... with session cookie" --> Session
+    Static -- "index.html, JS, CSS" --> UI
+    Routes -- "Mongoose" --> Collections
+    Session -- "connect-mongo" --> Collections
+```
+
+### Data model
+
+A rating stores only its group and its position within that group. Scores are computed when they're read, by spreading the group's positions evenly across its range (liked 7–10, fine 4–6.9, disliked 0–3.9), so moving one dish never requires rewriting every score.
+
+```mermaid
+erDiagram
+    USER ||--o{ RATING : ranks
+    DISH ||--o{ RATING : "is ranked in"
+    USER ||--o{ PHOTO : uploads
+    DISH ||--o{ PHOTO : has
+    USER }o--o{ USER : follows
+
+    USER {
+        ObjectId _id
+        string email "unique"
+        string username "unique, 3-30 chars"
+        string password "bcrypt hash, never returned"
+        ObjectId[] following
+    }
+    DISH {
+        ObjectId _id
+        string name
+        string hall
+        boolean vegetarian
+        boolean vegan
+        boolean glutenFree
+    }
+    RATING {
+        ObjectId user
+        ObjectId dish
+        string group "liked, fine, or disliked"
+        number position "0 is best in the group"
+        date updatedAt "drives the feed and top dishes"
+    }
+    PHOTO {
+        ObjectId dish
+        ObjectId user
+        string contentType "image/jpeg or image/png"
+        buffer data "under 5 MB"
+    }
+```
+
+### Rating and ranking a dish
+
+```mermaid
+sequenceDiagram
+    actor Student
+    participant Dish as Dish page
+    participant Compare as CompareDishes
+    participant API as Express API
+    participant DB as MongoDB
+
+    Student->>Dish: clicks "Liked it"
+    Dish->>Compare: group = liked
+    Compare->>API: GET /api/ratings/me
+    API->>DB: find this user's ratings
+    API-->>Compare: ratings with scores
+    loop until the new dish's spot is found
+        Compare->>Student: "Which was better?" against the middle dish
+        Student->>Compare: picks one
+        Note over Compare: halves the range of possible positions
+    end
+    Compare->>API: POST /api/ratings { dishId, group, position }
+    API->>DB: shift the dishes below that position down by 1, then save the rating
+    API-->>Compare: saved rating
+    opt a photo was attached
+        Dish->>API: POST /api/dishes/:id/photos
+        API->>DB: store the image
+    end
+    Dish->>Student: "Rating saved!"
+```
+
 ## API
 
 Requests and responses are JSON unless noted. Errors look like `{ "error": "message" }`. Login state is an HttpOnly session cookie, so send requests with `credentials: "include"`. 🔒 means the route returns 401 when you aren't logged in.
