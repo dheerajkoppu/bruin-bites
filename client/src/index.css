@@ -470,6 +470,32 @@ select {
   border-radius: var(--radius);
 }
 
+.badge-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.badge-list li {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.badge-list h3 {
+  margin: 0;
+  color: var(--blue-dark);
+}
+
+.badge-list time {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .compare {
   text-align: center;
 }
