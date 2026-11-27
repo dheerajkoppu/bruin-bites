@@ -4,6 +4,8 @@ import { requireLogin } from "../middleware/requireLogin.js";
 import User from "../models/User.js";
 import { rankedRatingsFor } from "../models/Rating.js";
 import { escapeRegExp } from "../utils/escapeRegExp.js";
+import mongoose from "mongoose";
+import Dish from "../models/Dish.js";
 
 const router = Router();
 
@@ -87,5 +89,17 @@ router.get("/", requireLogin, async (request, response) => {
   const users = await User.find({ username: { $regex: regex }, _id: { $ne: request.session.userId } }).select("username").limit(10);
   response.json(users);
 });
+
+router.post("/me/want-to-try", requireLogin, async (request, response) => {
+  const { dishId } = request.body;
+  const dish = mongoose.isValidObjectId(dishId) && (await Dish.findById(dishId)); 
+  if(!dish) {
+    throw new HttpError(404, "Dish not found.");
+  }
+  await User.findByIdAndUpdate(request.session.userId, { $addToSet: { wantToTry: dish._id } });
+  response.status(200).json({ message: `Dish ${dish.name} added to want-to-try list.` });
+});
+
+
 
 export default router;
