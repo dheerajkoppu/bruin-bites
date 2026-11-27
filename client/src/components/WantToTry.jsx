@@ -7,6 +7,7 @@ function WantToTry({ dish }) {
   const [savedDishes, setSavedDishes] = useState(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let ignore = false;
@@ -29,7 +30,12 @@ function WantToTry({ dish }) {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [attempt]);
+
+  function retryLoad() {
+    setError("");
+    setAttempt((previous) => previous + 1);
+  }
 
   async function saveDish() {
     setSaving(true);
@@ -69,7 +75,13 @@ function WantToTry({ dish }) {
 
   function showDishes() {
     if (savedDishes === null) {
-      if (error) return null;
+      if (error) {
+        return (
+          <button type="button" onClick={retryLoad}>
+            Try loading Want to Try again
+          </button>
+        );
+      }
       return <p>Loading Want to Try...</p>;
     }
 

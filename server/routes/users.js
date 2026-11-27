@@ -101,7 +101,10 @@ router.post("/me/want-to-try", requireLogin, async (request, response) => {
     throw new HttpError(404, "Dish not found.");
   }
 
-  await User.findByIdAndUpdate(request.session.userId, { $addToSet: { wantToTry: dish._id } });
+  const user = await User.findByIdAndUpdate(request.session.userId, { $addToSet: { wantToTry: dish._id } });
+  if (!user) {
+    throw new HttpError(404, "User not found.");
+  }
   response.status(200).json({ message: `Dish ${dish.name} added to want-to-try list.` });
 });
 
@@ -112,7 +115,10 @@ router.delete("/me/want-to-try/:dishId", requireLogin, async (request, response)
   }
 
   // Pull without looking up the dish so ids left behind by a reseed can still be removed.
-  await User.findByIdAndUpdate(request.session.userId, { $pull: { wantToTry: dishId } });
+  const user = await User.findByIdAndUpdate(request.session.userId, { $pull: { wantToTry: dishId } });
+  if (!user) {
+    throw new HttpError(404, "User not found.");
+  }
   response.status(200).json({ message: "Dish removed from want-to-try list." });
 });
 

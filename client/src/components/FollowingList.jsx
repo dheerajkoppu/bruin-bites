@@ -22,10 +22,12 @@ function FollowingList({ following, setFollowing }) {
         const data = await response.json();
 
         if (!ignore) {
-          setFollowing(data.following);
+          setFollowing(data.following ?? []);
         }
       } catch {
         if (!ignore) {
+          // An empty list keeps the Follow buttons in search usable.
+          setFollowing([]);
           setError("Could not load followed users.");
         }
       } finally {
