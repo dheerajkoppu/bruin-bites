@@ -31,20 +31,15 @@ export function scoreFor(group, position, groupSize) {
 const Rating = mongoose.model("Rating", ratingSchema);
 
 export async function rankedRatingsFor(userId) {
-    const ratings = await Rating.find({ user: userId })
-      .populate("dish")
-      .sort({ position: 1 })
-      .lean();
-    const groupSizes = { liked: 0, fine: 0, disliked: 0 };
-    for (const rating of ratings) {
-      groupSizes[rating.group]++;
-    }
-    const withScores = ratings.map((rating) => ({
-      ...rating,
-      score: scoreFor(rating.group, rating.position, groupSizes[rating.group]),
-    }));
-    
-    return withScores;
-  } 
+  const ratings = await Rating.find({ user: userId }).populate("dish").sort({ position: 1 }).lean();
+  const groupSizes = { liked: 0, fine: 0, disliked: 0 };
+  for (const rating of ratings) {
+    groupSizes[rating.group]++;
+  }
+  return ratings.map((rating) => ({
+    ...rating,
+    score: scoreFor(rating.group, rating.position, groupSizes[rating.group]),
+  }));
+}
 
 export default Rating;
