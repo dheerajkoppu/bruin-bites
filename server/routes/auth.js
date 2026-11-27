@@ -12,7 +12,7 @@ async function startSession(request, user) {
 }
 
 router.post("/signup", async (request, response) => {
-  const { email, username, password } = request.body;
+  const { email, username, password } = request.body ?? {};
   const user = new User({ email, username, password });
   await user.validate();
 
@@ -28,7 +28,7 @@ router.post("/signup", async (request, response) => {
 });
 
 router.post("/login", async (request, response) => {
-  const { email, password } = request.body;
+  const { email, password } = request.body ?? {};
   const user = await User.findOne({ email: String(email ?? "").trim().toLowerCase() }).select("+password");
   if (!user || !(await user.checkPassword(String(password ?? "")))) {
     throw new HttpError(401, "Incorrect email or password.");

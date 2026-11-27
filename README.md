@@ -63,6 +63,7 @@ Open http://localhost:5173. The Vite dev server sends every request starting wit
 | What | Command | Needs a database? |
 |---|---|---|
 | Client component and API tests (Vitest) | `cd client && npm test` | No, they fake the server |
+| Server API tests (node:test and Supertest) | `cd server && npm test` | No, each test file starts its own in-memory MongoDB |
 | Lint and production build | `cd client && npm run lint && npm run build` | No |
 | End-to-end tests (Playwright) | `cd e2e && npm install && npx playwright install chromium && npm test` | No, they start their own in-memory MongoDB |
 
@@ -210,12 +211,14 @@ client/
     App.jsx       routes
     *.test.jsx    Vitest component tests
 server/
-  index.js        Express app: sessions, routers, and serving the built client
+  app.js          Express app: sessions, routers, and serving the built client
+  index.js        connects to MongoDB and starts the app
   routes/         one router per feature: auth, halls, dishes, ratings, users, feed, photos
   models/         Mongoose models: User, Dish, Rating, Photo
   middleware/     requireLogin and the error handler
   session.js      session cookie setup
   seed.js         loads dishes.json into the database
+  test/           API tests against an in-memory MongoDB
 e2e/
   tests/          Playwright end-to-end tests
   start-server.js runs the real server against an in-memory MongoDB
