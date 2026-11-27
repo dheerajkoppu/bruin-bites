@@ -1,10 +1,10 @@
 import MongoStore from "connect-mongo";
 import session from "express-session";
 
-export function createSession() {
+export function createSession(store = MongoStore.create({ mongoUrl: process.env.MONGODB_URI })) {
   return session({
     secret: process.env.SESSION_SECRET,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+    store,
     resave: false,
     saveUninitialized: false,
     cookie: {
