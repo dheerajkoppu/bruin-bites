@@ -2,9 +2,12 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router";
 import TopDishes from "../components/TopDishes.jsx";
+import AddDish from "../components/AddDish.jsx";
+import { useAuth } from "../context/useAuth.js";
 
 function Hall() {
   const { hallName } = useParams();
+  const user = useAuth()?.user;
   const [dishes, setDishes] = useState([]);
   const [selectedDiet, setSelectedDiet] = useState("all");
   const [searchText, setSearchText] = useState("");
@@ -68,6 +71,10 @@ function Hall() {
       </div>
 
       <h2>Dishes</h2>
+
+      {user && (
+        <AddDish hallName={hallName} onAdded={(dish) => setDishes((current) => [...current, dish])} />
+      )}
 
       {visibleDishes.length === 0 && (
         <p className="empty-state">No dishes match your search or filter.</p>

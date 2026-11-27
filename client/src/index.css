@@ -523,3 +523,32 @@ select {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+.add-dish-form {
+  margin: 0 0 24px;
+}
+
+.add-dish-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.add-dish-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-dish-row input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.add-dish-form .form-error {
+  margin-top: 8px;
+}
