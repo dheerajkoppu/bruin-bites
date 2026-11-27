@@ -100,6 +100,18 @@ router.post("/me/want-to-try", requireLogin, async (request, response) => {
   response.status(200).json({ message: `Dish ${dish.name} added to want-to-try list.` });
 });
 
+router.delete("/me/want-to-try/:dishId", requireLogin, async (request, response) => {
+  const { dishId } = request.params;
+
+  const dish = mongoose.isValidObjectId(dishId) && (await Dish.findById(dishId));
+  if (!dish) {
+    throw new HttpError(404, "Dish not found.");
+  }
+
+  await User.findByIdAndUpdate(request.session.userId, { $pull: { wantToTry: dish._id } });
+  response.status(200).json({ message: `Dish ${dish.name} removed from want-to-try list.` });
+});
+
 
 
 export default router;
